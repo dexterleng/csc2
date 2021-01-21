@@ -1,9 +1,10 @@
 const express = require('express');
+const viewRouter = require('./viewRouter');
 const apiRouter = require('./apiRouter');
 const app = express();
 
-app.use(express.static('public'));
-
+app.set('view engine', 'ejs');
+app.use(viewRouter);
 app.use('/api', apiRouter);
 
 const PORT = 3000;
