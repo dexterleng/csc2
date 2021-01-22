@@ -5,3 +5,4 @@ terraform/.terraform*
 *.backup
 *.pem
 swagger.json
+uploads/

@@ -21,6 +21,7 @@ app.use('/api', apiRouter);
 app.set('view engine', 'ejs');
 app.use(viewRouter);
 
+const PORT = 5000;
 app.listen(PORT, () => {
     console.log(`Listening on port ${PORT}`)
 })
