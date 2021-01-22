@@ -6,6 +6,7 @@ const TalentRepository = require('./repository/talent');
 
 const multer  = require('multer');
 const multerS3 = require('multer-s3');
+const { ResourceNotFound, ResourceValidationError } = require('./repository/errors');
 const s3 = new aws.S3({});
 
 const S3_BUCKET = 'test';
@@ -71,7 +72,8 @@ const talentMulterMiddleware = multer({
     if(mimetype && extname){
       return cb(null,true);
     } else {
-      cb('Error: Images Only!');
+      const e = new ResourceValidationError();
+      cb(e, null);
     }
   }
 }).single('profile_picture');
@@ -107,8 +109,14 @@ router.get('/talents/:id', async (req, res, next) => {
 })
 
 router.use(function (err, req, res, next) {
-  console.error(err.stack)
-  res.status(500).send('Something broke!')
+  if (err instanceof ResourceNotFound) {
+    res.status(404).send(err.responseJson);
+  } else if (err instanceof ResourceValidationError) {
+    res.status(400).send(err.responseJson);
+  } else {
+    console.error(err.stack)
+    res.status(500).send('Something broke!')
+  }
 })
 
 module.exports = router;
