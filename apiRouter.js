@@ -23,7 +23,6 @@ const s3Storage = multerS3({
   }
 });
 
-<<<<<<< HEAD
 /**
  * @swagger
  * /healthcheck:
@@ -43,7 +42,8 @@ const s3Storage = multerS3({
  */
 router.use('/healthcheck', function (req, res, next) {
     res.status(200).send('API Healthy');
-=======
+});
+
 const diskStorage = multer.diskStorage({
   destination: function (req, file, cb) {
     cb(null, './uploads')
@@ -56,7 +56,6 @@ const diskStorage = multer.diskStorage({
 
 router.get('/healthcheck', function (req, res, next) {
   res.status(200).send('API Healthy');
->>>>>>> create repository; talent apis
 })
 
 // taken from https://stackoverflow.com/a/60408823/10390454
@@ -85,8 +84,8 @@ router.post('/talents/', talentMulterMiddleware, async (req, res, next) => {
     const profile_picture_path = req.file.path;
     const { name, description } = req.body;
 
-    const isFacePresent = await isFacePresent();
-    if (!isFacePresent) {
+    const isHuman = await isFacePresent(profile_picture_path);
+    if (!isHuman) {
       res.status(400).send({
         message: "Our Face Detection Service has detected a lack of humans in this picture!"
       });
@@ -120,7 +119,7 @@ router.use(function (err, req, res, next) {
   } else if (err instanceof ResourceValidationError) {
     res.status(400).send(err.responseJson);
   } else {
-    console.error(err.stack)
+    console.error(err)
     res.status(500).send('Something broke!')
   }
 })

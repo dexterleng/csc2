@@ -1,5 +1,20 @@
 const db = require('../db');
 const { ResourceNotFound, ResourceValidationError } = require('./errors');
+const talentAlgoliaIndex = require('../talentAlgoliaIndex');
+
+// talentAlgoliaIndex.saveObject({
+//   objectID: 1,
+//   name: 'df',
+//   description: 'sdfs'
+// }).catch(e => console.log(e));
+
+// talentAlgoliaIndex.partialUpdateObject({
+//   objectID: 1,
+//   name: '1231231',
+//   description: '333333'
+// });
+
+// talentAlgoliaIndex.deleteObject(1).catch(e => console.log(e));
 
 class TalentRepository {
   async insert({ name, description, profile_picture_path }) {
@@ -29,11 +44,18 @@ class TalentRepository {
       throw new ResourceValidationError(validationErrors);
     }
 
-    await db('talent')
+    const ids = await db('talent')
       .insert({
         name, description, profile_picture_path,
         created_at: new Date()
       });
+    const id = ids[0];
+
+    await talentAlgoliaIndex.saveObject({
+      objectID: id,
+      name,
+      description
+    });
   }
 
   async find(id) {
@@ -44,6 +66,32 @@ class TalentRepository {
     }
 
     return result;
+  }
+
+  async search(query) {
+    // TODO: pagination, if needed.
+
+    const { hits } = await talentAlgoliaIndex.search(query);
+    const ids = hits.map(hit => hit.objectID);
+    const unorderedTalents = await db('talent').select().whereIn('id', ids);
+    const talentsById = {}
+    for (const talent of unorderedTalents) {
+      talentsById[talent.id] = talent;
+    }
+
+    let talents = []
+    for (const id of ids) {
+      const talent = talentsById[id];
+
+      if (talent === null || talent === undefined) {
+        // talents in algolia out of sync with database.
+        console.log(`Talent of ${id} is stored in algolia but not found in database.`);
+      } else {
+        talents.push(talent);
+      }
+    }
+
+    return talents
   }
 }
 
