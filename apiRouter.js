@@ -7,6 +7,7 @@ const TalentRepository = require('./repository/talent');
 const multer  = require('multer');
 const multerS3 = require('multer-s3');
 const { ResourceNotFound, ResourceValidationError } = require('./repository/errors');
+const { isFacePresent } = require('./face_detection');
 const s3 = new aws.S3({});
 
 const S3_BUCKET = 'test';
@@ -84,8 +85,13 @@ router.post('/talents/', talentMulterMiddleware, async (req, res, next) => {
     const profile_picture_path = req.file.path;
     const { name, description } = req.body;
 
-    // TODO: validate if human with Clarifai
-    // Create disque id
+    const isFacePresent = await isFacePresent();
+    if (!isFacePresent) {
+      res.status(400).send({
+        message: "Our Face Detection Service has detected a lack of humans in this picture!"
+      });
+      return;
+    }
 
     await TalentRepository.insert({ name, description, profile_picture_path });
 

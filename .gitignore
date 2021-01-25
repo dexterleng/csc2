@@ -6,3 +6,4 @@ terraform/.terraform*
 *.pem
 swagger.json
 uploads/
+.env
