@@ -11,7 +11,7 @@ resource "aws_internet_gateway" "default" {
 }
 
 /*
-  NAT Instance
+    NAT Instance
 */
 resource "aws_security_group" "nat" {
     name = "csc2-public"
@@ -98,7 +98,7 @@ resource "aws_eip" "nat" {
 
 resource "aws_nat_gateway" "nat" {
     allocation_id = aws_eip.nat.id
-    subnet_id     = aws_subnet.csc2-public.id
+    subnet_id = aws_subnet.csc2-public.id
     
     tags = {
         Name = "VPC NAT"
@@ -107,7 +107,7 @@ resource "aws_nat_gateway" "nat" {
 
 
 /*
-  Public Subnet
+    Public Subnet
 */
 resource "aws_subnet" "csc2-public" {
     vpc_id = aws_vpc.default.id
@@ -139,7 +139,7 @@ resource "aws_route_table_association" "csc2-public" {
 }
 
 /*
-  Private Subnet
+    Private Subnet
 */
 resource "aws_subnet" "csc2-private" {
     vpc_id = aws_vpc.default.id
@@ -152,12 +152,23 @@ resource "aws_subnet" "csc2-private" {
     }
 }
 
+resource "aws_subnet" "csc2-private1" {
+    vpc_id = aws_vpc.default.id
+
+    cidr_block = var.private_subnet1_cidr
+    availability_zone = "us-east-1b"
+
+    tags = {
+        Name = "Private Subnet"
+    }
+}
+
 resource "aws_route_table" "csc2-private" {
     vpc_id = aws_vpc.default.id
 
     route {
         cidr_block = "0.0.0.0/0"
-        instance_id = aws_nat_gateway.nat.id
+        nat_gateway_id = aws_nat_gateway.nat.id
     }
 
     tags = {
@@ -170,3 +181,7 @@ resource "aws_route_table_association" "csc2-private" {
     route_table_id = aws_route_table.csc2-private.id
 }
 
+resource "aws_route_table_association" "csc2-private1" {
+    subnet_id = aws_subnet.csc2-private1.id
+    route_table_id = aws_route_table.csc2-private.id
+}
