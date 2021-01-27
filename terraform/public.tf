@@ -6,9 +6,9 @@ resource "aws_security_group" "web" {
     description = "Allow incoming HTTP connections."
 
     ingress {
-        from_port = 80
-        to_port = 80
-        protocol = "tcp"
+        from_port   = 0
+        to_port     = 0
+        protocol    = "-1"
         cidr_blocks = ["0.0.0.0/0"]
     }
     ingress {
@@ -30,17 +30,17 @@ resource "aws_security_group" "web" {
         cidr_blocks = ["0.0.0.0/0"]
     }
 
-    egress { # SQL Server
-        from_port = 1433
-        to_port = 1433
-        protocol = "tcp"
-        cidr_blocks = [var.private_subnet_cidr]
-    }
     egress { # MySQL
         from_port = 3306
         to_port = 3306
         protocol = "tcp"
         cidr_blocks = [var.private_subnet_cidr]
+    }
+    egress {
+        from_port   = 0
+        to_port     = 0
+        protocol    = "-1"
+        cidr_blocks = ["0.0.0.0/0"]
     }
 
     vpc_id = aws_vpc.default.id
@@ -102,9 +102,28 @@ resource "aws_lb" "nlb" {
 
 }
 
+resource "aws_lb_listener" "nlb" {
+    load_balancer_arn = aws_lb.nlb.arn
+    port = "80"
+    protocol = "TCP"
+
+    default_action {
+        type = "forward"
+        target_group_arn = aws_lb_target_group.nlb.arn
+    }
+}
+
+resource "aws_lb_target_group_attachment" "test" {
+    target_group_arn = aws_lb_target_group.nlb.arn
+    target_id = aws_instance.csc2-app.id
+    port = 80
+}
+
+
 resource "aws_lb_target_group" "nlb" {
-    name     = "csc2-app"
-    port     = 80
-    protocol = "HTTP"
+    name = "csc2-app"
+    port = 80
+    protocol = "TCP"
+    target_type = "instance"
     vpc_id   = aws_vpc.default.id
 }

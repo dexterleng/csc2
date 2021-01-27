@@ -1,6 +1,7 @@
 variable "aws_access_key" {}
 variable "aws_secret_key" {}
 variable "aws_session_token" {}
+variable "swagger_file_path" {}
 # variable "aws_key_path" {}
 # variable "aws_key_name" {}
 
@@ -34,4 +35,13 @@ variable "private_subnet_cidr" {
 variable "private_subnet1_cidr" {
     description = "CIDR for the Second Private Subnet"
     default = "10.0.2.0/24"
+}
+
+data "template_file" "aws_api_swagger" {
+    template = file(var.swagger_file_path)
+
+    # vars = {
+    #     backend_uri = "$${}"
+    # }
+
 }
