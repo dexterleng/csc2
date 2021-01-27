@@ -8,16 +8,9 @@ const talentAlgoliaIndex = require('../talentAlgoliaIndex');
 //   description: 'sdfs'
 // }).catch(e => console.log(e));
 
-// talentAlgoliaIndex.partialUpdateObject({
-//   objectID: 1,
-//   name: '1231231',
-//   description: '333333'
-// });
-
-// talentAlgoliaIndex.deleteObject(1).catch(e => console.log(e));
 
 class TalentRepository {
-  async insert({ name, description, profile_picture_path }) {
+  validate({ name, description, profile_picture_path }) {
     const validationErrors = [];
     if (typeof(name) !== 'string') {
       validationErrors.push({
@@ -40,6 +33,13 @@ class TalentRepository {
       }); 
     }
 
+    return validationErrors;
+  }
+
+  async insert(data) {
+    const { name, description, profile_picture_path } = data;
+    const validationErrors = this.validate(data);
+
     if (validationErrors.length > 0) {
       throw new ResourceValidationError(validationErrors);
     }
@@ -55,6 +55,32 @@ class TalentRepository {
       objectID: id,
       name,
       description
+    });
+  }
+
+  async update(id, data) {
+    // TODO: consider deleting previous image
+    const { name, description, profile_picture_path } = data;
+    const validationErrors = this.validate(data);
+
+    if (validationErrors.length > 0) {
+      throw new ResourceValidationError(validationErrors);
+    }
+
+    // assert the presence of the talent
+    await this.find(id);
+
+    await db('talent')
+      .where('id', id)
+      .update({
+        name, description, profile_picture_path,
+        updated_at: new Date()
+      });
+
+    await talentAlgoliaIndex.partialUpdateObject({
+      objectID: id,
+      name,
+      description,
     });
   }
 
@@ -96,6 +122,15 @@ class TalentRepository {
     }
 
     return talents
+  }
+
+  async delete(id) {
+    // TODO: Consider deleting the image from disk/s3
+
+    const talent = await this.find(id);
+    await db('talent').where('id', talent.id).delete();
+
+    await talentAlgoliaIndex.deleteObject(talent.id)
   }
 }
 

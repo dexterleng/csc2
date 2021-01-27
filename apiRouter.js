@@ -100,6 +100,28 @@ router.post('/talents/', talentMulterMiddleware, async (req, res, next) => {
   }
 });
 
+
+router.put('/talents/:id', talentMulterMiddleware, async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const profile_picture_path = req.file.path;
+
+    const isHuman = await isFacePresent(profile_picture_path);
+    if (!isHuman) {
+      res.status(400).send({
+        message: "Our Face Detection Service has detected a lack of humans in this picture!"
+      });
+      return;
+    }
+
+    await TalentRepository.update(id, req.body);
+
+    res.status(204).send();
+  } catch (e) {
+    next(e);
+  }
+});
+
 router.get('/talents/', async (req, res, next) => {
   try {
     const { query } = req.query;
@@ -129,6 +151,17 @@ router.get('/talents/:id', async (req, res, next) => {
     next(e);
   }
 })
+
+router.delete('/talents/:id', async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    await TalentRepository.delete(id);
+
+    res.status(204).send();
+  } catch (e) {
+    next(e);
+  }
+});
 
 router.use(function (err, req, res, next) {
   if (err instanceof ResourceNotFound) {
