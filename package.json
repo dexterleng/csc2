@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
-    "docs": "npx swagger-jsdoc -d swaggerDefinition.json *.js",
+    "docs": "npx swagger-jsdoc -d swaggerDefinition.json *.js *.yaml && node util/swagger-post.js swagger.json",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",

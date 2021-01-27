@@ -5,6 +5,20 @@
         "version": "1.0.0"
     },
     "servers": [
-        { "url": "http://localhost:3001/api", "description": "Local Server" }
-    ]
+        {
+            "url": "http://localhost:3001/api",
+            "description": "Local Server"
+        }
+    ],
+    "components": {
+        "x-amazon-apigateway-integrations": {
+            "integration": {
+                "uri": "http://dummydomain.com",
+                "passthroughBehavior": "when_no_match",
+                "connectionType": "VPC_LINK",
+                "connectionId": "${stageVariables.vpcLinkId}",
+                "type": "http_proxy"
+            }
+        }
+    }
 }
