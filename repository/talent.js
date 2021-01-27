@@ -68,12 +68,16 @@ class TalentRepository {
     return result;
   }
 
+  async findAll() {
+    return await db('talent').select().orderBy('created_at', 'desc');
+  }
+
   async search(query) {
     // TODO: pagination, if needed.
 
     const { hits } = await talentAlgoliaIndex.search(query);
     const ids = hits.map(hit => hit.objectID);
-    const unorderedTalents = await db('talent').select().whereIn('id', ids);
+    const unorderedTalents = await db('talent').select().whereIn('id', ids).orderBy('created_at', 'desc');
     const talentsById = {}
     for (const talent of unorderedTalents) {
       talentsById[talent.id] = talent;

@@ -94,8 +94,25 @@ router.post('/talents/', talentMulterMiddleware, async (req, res, next) => {
 
     await TalentRepository.insert({ name, description, profile_picture_path });
 
-    // TODO: index image with algolia
     res.status(201).send();
+  } catch (e) {
+    next(e);
+  }
+});
+
+router.get('/talents/', async (req, res, next) => {
+  try {
+    const { query } = req.query;
+
+    let talents;
+
+    if (query) {
+      talents = await TalentRepository.search(query);
+    } else {
+      talents = await TalentRepository.findAll();
+    }
+
+    res.status(200).send(talents);
   } catch (e) {
     next(e);
   }
