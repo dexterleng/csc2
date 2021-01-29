@@ -5,7 +5,7 @@ const TalentRepository = require('./repository/talent');
 const { ResourceNotFound, ResourceValidationError } = require('./repository/errors');
 const { isFacePresent } = require('./face_detection');
 const multerUpload = require('./multerImageUpload');
-const uploadToS3 = require('./uploadToS3');
+const { uploadToS3, generateGetPresignedUrl } = require('./s3');
 
 /**
  * @swagger
@@ -96,7 +96,14 @@ router.get('/talents/', async (req, res, next) => {
       talents = await TalentRepository.findAll();
     }
 
-    res.status(200).send(talents);
+    const talentsWithS3PresignedUrl = talents.map(talent => {
+      return {
+        ...talent,
+        profile_picture_url: generateGetPresignedUrl(talent.profile_picture_path)
+      }
+    })
+
+    res.status(200).send(talentsWithS3PresignedUrl);
   } catch (e) {
     next(e);
   }
@@ -106,7 +113,11 @@ router.get('/talents/:id', async (req, res, next) => {
   try {
     const { id } = req.params;
     const talent = await TalentRepository.find(id);
-    res.status(200).send(talent);
+    const talentWithS3PresignedUrl = {
+      ...talent,
+      profile_picture_url: generateGetPresignedUrl(talent.profile_picture_path)
+    }
+    res.status(200).send(talentWithS3PresignedUrl);
 
     // TODO: Fetch and attach presigned url from S3
   } catch (e) {
