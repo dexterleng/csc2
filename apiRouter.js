@@ -17,13 +17,6 @@ const router = express.Router()
  *                          examples:
  *                              default:
  *                                  value: API Healthy
- *          x-amazon-apigateway-integration:
- *              <<: *integration
- *              responses:
- *                  default:
- *                      statusCode: 200
- *              httpMethod: GET
- *              
  */
 router.use('/healthcheck', function (req, res, next) {
     res.status(200).send('API Healthy');
