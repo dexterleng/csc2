@@ -1,8 +1,6 @@
 // Update with your config settings.
-const DB_HOST = 'localhost';
-const DB_NAME = 'csc';
-const DB_USER = 'root';
-const DB_PASSWORD = '12345';
+
+const { DB_HOST, DB_USER, DB_PASSWORD, DB_NAME } = require("./env_constants");
 
 const config = {
   client: 'mysql2',
