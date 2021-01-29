@@ -7,12 +7,13 @@ const apiRouter = require('./apiRouter');
 
 const PORT = 3001;
 
-const options = {
-    swaggerDefinition: require("./swaggerDefinition"),
-    apis: ["./*.js"]
-}
+// const options = {
+//     swaggerDefinition: require("./swaggerDefinition"),
+//     apis: ["./*.js"]
+// }
 
-const swaggerSpec = swaggerJSDoc(options);
+// const swaggerSpec = swaggerJSDoc(options);
+const swaggerSpec = require("./swagger.json");
 
 const app = express();
 

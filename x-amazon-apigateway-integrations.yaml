@@ -3,5 +3,5 @@ x-amazon-apigateway-integrations:
         uri: http://dummydomain.com
         passthroughBehavior: when_no_match
         connectionType: VPC_LINK
-        connectionId: ${stageVariables.vpcLinkId}
+        connectionId: $${stageVariables.vpcLinkId}
         type: http_proxy
