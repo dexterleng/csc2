@@ -7,8 +7,6 @@ const swaggerUi = require('swagger-ui-express');
 const viewRouter = require('./viewRouter');
 const apiRouter = require('./apiRouter');
 
-const PORT = 3001;
-
 const options = {
     swaggerDefinition: require("./swaggerDefinition"),
     apis: ["./*.js"]
