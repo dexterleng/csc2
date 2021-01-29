@@ -78,6 +78,7 @@ const talentMulterMiddleware = multer({
   }
 }).single('profile_picture');
 
+router.use("/users", require("./controllers/users"));
 
 router.post('/talents/', talentMulterMiddleware, async (req, res, next) => {
   try {
