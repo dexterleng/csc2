@@ -1,27 +1,11 @@
-const aws = require('aws-sdk');
 const express = require('express')
 const router = express.Router();
-const path = require('path');
 const TalentRepository = require('./repository/talent');
 
-const multer  = require('multer');
-const multerS3 = require('multer-s3');
 const { ResourceNotFound, ResourceValidationError } = require('./repository/errors');
 const { isFacePresent } = require('./face_detection');
-const s3 = new aws.S3({});
-
-const S3_BUCKET = 'test';
-
-const s3Storage = multerS3({
-  s3: s3,
-  bucket: S3_BUCKET,
-  metadata: function (req, file, cb) {
-    cb(null, {fieldName: file.fieldname});
-  },
-  key: function (req, file, cb) {
-    cb(null, './talents/' + Date.now().toString())
-  }
-});
+const multerUpload = require('./multerImageUpload');
+const uploadToS3 = require('./uploadToS3');
 
 /**
  * @swagger
@@ -44,47 +28,18 @@ router.use('/healthcheck', function (req, res, next) {
     res.status(200).send('API Healthy');
 });
 
-const diskStorage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, './uploads')
-  },
-  filename: function (req, file, cb) {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9)
-    cb(null, file.fieldname + '-' + uniqueSuffix)
-  }
-})
-
 router.get('/healthcheck', function (req, res, next) {
   res.status(200).send('API Healthy');
 })
 
-// taken from https://stackoverflow.com/a/60408823/10390454
-const talentMulterMiddleware = multer({
-  storage: diskStorage,
-  limits: {
-    fieldSize: 1048576
-  },
-  fileFilter: function(req, file, cb){
-    const filetypes = /jpeg|jpg|png/;
-    const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
-    const mimetype = filetypes.test(file.mimetype);
+const uploadProfilePictureMiddleware = multerUpload.single('profile_picture')
 
-    if(mimetype && extname){
-      return cb(null,true);
-    } else {
-      const e = new ResourceValidationError();
-      cb(e, null);
-    }
-  }
-}).single('profile_picture');
-
-
-router.post('/talents/', talentMulterMiddleware, async (req, res, next) => {
+router.post('/talents/', uploadProfilePictureMiddleware, async (req, res, next) => {
   try {
-    const profile_picture_path = req.file.path;
+    const profile_picture_disk_path = req.file.path;
     const { name, description } = req.body;
 
-    const isHuman = await isFacePresent(profile_picture_path);
+    const isHuman = await isFacePresent(profile_picture_disk_path);
     if (!isHuman) {
       res.status(400).send({
         message: "Our Face Detection Service has detected a lack of humans in this picture!"
@@ -92,7 +47,10 @@ router.post('/talents/', talentMulterMiddleware, async (req, res, next) => {
       return;
     }
 
-    await TalentRepository.insert({ name, description, profile_picture_path });
+    const profile_picture_key = req.file.filename;
+    await uploadToS3(profile_picture_disk_path, profile_picture_key);
+
+    await TalentRepository.insert({ name, description, profile_picture_path: profile_picture_key });
 
     res.status(201).send();
   } catch (e) {
@@ -101,12 +59,13 @@ router.post('/talents/', talentMulterMiddleware, async (req, res, next) => {
 });
 
 
-router.put('/talents/:id', talentMulterMiddleware, async (req, res, next) => {
+router.put('/talents/:id', uploadProfilePictureMiddleware, async (req, res, next) => {
   try {
     const { id } = req.params;
-    const profile_picture_path = req.file.path;
+    const profile_picture_disk_path = req.file.path;
+    const { name, description } = req.body;
 
-    const isHuman = await isFacePresent(profile_picture_path);
+    const isHuman = await isFacePresent(profile_picture_disk_path);
     if (!isHuman) {
       res.status(400).send({
         message: "Our Face Detection Service has detected a lack of humans in this picture!"
@@ -114,7 +73,10 @@ router.put('/talents/:id', talentMulterMiddleware, async (req, res, next) => {
       return;
     }
 
-    await TalentRepository.update(id, req.body);
+    const profile_picture_key = req.file.filename;
+    await uploadToS3(profile_picture_disk_path, profile_picture_key);
+
+    await TalentRepository.update(id, { name, description, profile_picture_path: profile_picture_key });
 
     res.status(204).send();
   } catch (e) {
