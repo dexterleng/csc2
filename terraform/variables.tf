@@ -1,7 +1,6 @@
 variable "aws_access_key" {}
 variable "aws_secret_key" {}
 variable "aws_session_token" {}
-variable "swagger_file_path" {}
 # variable "aws_key_path" {}
 # variable "aws_key_name" {}
 
