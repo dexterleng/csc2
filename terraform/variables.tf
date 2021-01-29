@@ -37,11 +37,6 @@ variable "private_subnet1_cidr" {
     default = "10.0.2.0/24"
 }
 
-data "template_file" "aws_api_swagger" {
-    template = file(var.swagger_file_path)
-
-    # vars = {
-    #     backend_uri = "$${}"
-    # }
-
-}
+# data "template_file" "aws_api_swagger" {
+#     template = file(var.swagger_file_path)
+# }
