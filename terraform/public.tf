@@ -127,3 +127,16 @@ resource "aws_lb_target_group" "nlb" {
     target_type = "instance"
     vpc_id   = aws_vpc.default.id
 }
+
+resource "aws_s3_bucket" "s3" {
+  bucket = "csc2-bucket"
+  acl    = "private"
+
+  cors_rule {
+    allowed_headers = ["*"]
+    allowed_methods = ["GET", "PUT", "POST"]
+    allowed_origins = ["*"]
+    expose_headers  = ["ETag"]
+    max_age_seconds = 3000
+  }
+}
