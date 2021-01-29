@@ -11,7 +11,7 @@ aws.config.update({
 
 const s3 = new aws.S3();
 
-module.exports = function(source, key) {
+exports.uploadToS3 = function(source, key) {
   return new Promise((resolve, reject) => {
     fs.readFile(source, function (err, data) {
       if (err) {
@@ -39,5 +39,13 @@ module.exports = function(source, key) {
           });
       });
   });
+  });
+}
+
+exports.generateGetPresignedUrl = function(key) {
+  return s3.getSignedUrl('getObject', {
+    Bucket: S3_BUCKET,
+    Key: key,
+    Expires: 60 * 5
   });
 }
