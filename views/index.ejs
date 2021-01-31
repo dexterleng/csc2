@@ -1,6 +1,6 @@
 <%- include('partials/header') %>
 
-<form id="talent-search-form" style="padding-top: 20px;">
+<form id="talent-search-form" style="padding-top: 20px; margin-bottom: 2rem;">
   <div class="row">
     <div class="form-group col-sm-8">
       <input type="text" class="form-control" id="talent-search-query" placeholder="Search for talents">
@@ -16,6 +16,14 @@
 </div>
 
 <script>
+
+  function setLoadingState() {
+    $("#talents-container").empty();
+    $("#talents-container").append(`
+    <div class="spinner-border" role="status">
+    </div>
+    `);
+  }
 
   // TODO: cut off description beyond a certain length
   function renderTalentCard(talent) {
@@ -56,7 +64,7 @@
 
     const rows = talentCardsOfThree
       .map(cards => `
-        <div class='row' style="margin-top: 2rem;">
+        <div class='row' style="margin-bottom: 2rem;">
           ${cards.join('\n')}
         </div>
       `)
@@ -68,6 +76,21 @@
   function showTalents(talents) {
     $("#talents-container").empty();
     $("#talents-container").append(renderTalentGrid(talents));
+  }
+
+  function showError(e) {
+    let message = "Something went wrong."
+
+    if (e.status) {
+      message = `Network request failed with status ${e.status}`
+    }
+
+    $("#talents-container").empty();
+    $("#talents-container").append(`
+      <div class="alert alert-danger" role="alert">
+        ${message}
+      </div>
+    `);
   }
 
   function ajaxPromise(ajaxOptions) {
@@ -130,18 +153,22 @@
 
   const talentRepo = new TalentRepository();
 
-  talentRepo
-      .findAll()
+  Promise.resolve()
+      .then(() => setLoadingState())
+      .then(() => talentRepo.findAll())
       .then(showTalents)
-      .catch(e => alert(e));
+      .catch(showError);
 
   $("#talent-search-form").submit(function (e) {
     e.preventDefault();
 
     const query = $("#talent-search-query").text();
-    talentRepo.search(query)
+
+    Promise.resolve()
+      .then(() => setLoadingState())
+      .then(() => talentRepo.search(query))    
       .then(showTalents)
-      .catch(e => alert(e));
+      .catch(showError);
 
   });
 </script>
