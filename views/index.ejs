@@ -16,6 +16,26 @@
 </div>
 
 <script>
+  const talentRepo = new TalentRepository();
+
+  Promise.resolve()
+      .then(() => setLoadingState())
+      .then(() => talentRepo.findAll())
+      .then(showTalents)
+      .catch(showError);
+
+  $("#talent-search-form").submit(function (e) {
+    e.preventDefault();
+
+    const query = $("#talent-search-query").text();
+
+    Promise.resolve()
+      .then(() => setLoadingState())
+      .then(() => talentRepo.search(query))    
+      .then(showTalents)
+      .catch(showError);
+
+  });
 
   function setLoadingState() {
     $("#talents-container").empty();
@@ -92,27 +112,6 @@
       </div>
     `);
   }
-
-  const talentRepo = new TalentRepository();
-
-  Promise.resolve()
-      .then(() => setLoadingState())
-      .then(() => talentRepo.findAll())
-      .then(showTalents)
-      .catch(showError);
-
-  $("#talent-search-form").submit(function (e) {
-    e.preventDefault();
-
-    const query = $("#talent-search-query").text();
-
-    Promise.resolve()
-      .then(() => setLoadingState())
-      .then(() => talentRepo.search(query))    
-      .then(showTalents)
-      .catch(showError);
-
-  });
 </script>
 
 <%- include('partials/footer') %>

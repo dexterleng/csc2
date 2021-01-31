@@ -1,0 +1,60 @@
+<%- include('partials/header') %>
+
+<div id="talent-container">
+
+</div>
+
+<script>
+  const talentId = "<%= talentId %>";
+  const talentRepo = new TalentRepository();
+
+  Promise.resolve()
+      .then(() => setLoadingState())
+      .then(() => talentRepo.find(talentId))
+      .then(showTalent)
+      .catch(showError);
+
+  function setLoadingState() {
+    $("#talent-container").empty();
+    $("#talent-container").append(`
+    <div class="spinner-border" role="status">
+    </div>
+    `);
+  }
+
+  // TODO: cut off description beyond a certain length
+  function renderTalentCard(talent) {
+    return `
+<div class="card" style="width: 20rem;">
+  <img class="card-img-top" src="${talent.profile_picture_url}">
+  <div class="card-body">
+    <h5 class="card-title">${talent.name}</h5>
+    <p class="card-text">${talent.description}</p>
+    <a href="/talents/${talent.id}" class="btn btn-primary">View Profile</a>
+  </div>
+</div>
+    `;
+  }
+
+  function showTalent(talent) {
+    $("#talent-container").empty();
+    $("#talent-container").append(renderTalentCard(talent));
+  }
+
+  function showError(e) {
+    let message = "Something went wrong."
+
+    if (e.status) {
+      message = `Network request failed with status ${e.status}`
+    }
+
+    $("#talent-container").empty();
+    $("#talent-container").append(`
+      <div class="alert alert-danger" role="alert">
+        ${message}
+      </div>
+    `);
+  }
+</script>
+
+<%- include('partials/footer') %>

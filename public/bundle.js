@@ -45,4 +45,12 @@ class TalentRepository {
     });
     return talents;
   }
+
+  async find(id) {
+    const talent = await makeApiRequest({
+      type: 'GET',
+      url: `/api/talents/${id}`
+    });
+    return talent;
+  }
 }
