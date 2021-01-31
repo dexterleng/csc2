@@ -1,12 +1,149 @@
 <%- include('partials/header') %>
 
-<div class="mb-3">
-  <label for="exampleFormControlInput1" class="form-label">Email address</label>
-  <input type="email" class="form-control" id="exampleFormControlInput1" placeholder="name@example.com">
+<form id="talent-search-form" style="padding-top: 20px;">
+  <div class="row">
+    <div class="form-group col-sm-8">
+      <input type="text" class="form-control" id="talent-search-query" placeholder="Search for talents">
+    </div>
+    <div class="col-sm-4">
+      <button type="submit" class="btn btn-primary">Search</button>
+    </div>
+  </div>
+</form>
+
+<div id="talents-container" class="container">
+
 </div>
-<div class="mb-3">
-  <label for="exampleFormControlTextarea1" class="form-label">Example textarea</label>
-  <textarea class="form-control" id="exampleFormControlTextarea1" rows="3"></textarea>
+
+<script>
+
+  // TODO: cut off description beyond a certain length
+  function renderTalentCard(talent) {
+    return `
+<div class="card" style="width: 20rem;">
+  <img class="card-img-top" src="${talent.profile_picture_url}">
+  <div class="card-body">
+    <h5 class="card-title">${talent.name}</h5>
+    <p class="card-text">${talent.description}</p>
+    <a href="/talents/${talent.id}" class="btn btn-primary">View Profile</a>
+  </div>
 </div>
+    `;
+  }
+
+  function renderTalentGrid(talents) {
+    const talentCards = talents
+      .map(t => renderTalentCard(t))
+      .map(c => `
+      <div class="col-sm-4">
+        ${c}
+      </div>
+      `);
+    
+    const talentCardsOfThree = [];
+    let chunk = [];
+    for (let talentCard of talentCards) {
+      chunk.push(talentCard);
+      if (chunk.length === 3) {
+        talentCardsOfThree.push(chunk);
+        chunk = [];
+      }
+    }
+
+    if (chunk.length > 0) {
+      talentCardsOfThree.push(chunk);
+    }
+
+    const rows = talentCardsOfThree
+      .map(cards => `
+        <div class='row' style="margin-top: 2rem;">
+          ${cards.join('\n')}
+        </div>
+      `)
+      .join('\n');
+    
+    return rows;
+  }
+
+  function showTalents(talents) {
+    $("#talents-container").empty();
+    $("#talents-container").append(renderTalentGrid(talents));
+  }
+
+  function ajaxPromise(ajaxOptions) {
+    return new Promise((resolve, reject) => {
+      $.ajax(ajaxOptions)
+          .done(function (data) { resolve(data) })
+          .fail(function (jqXHR) { reject(jqXHR) });
+    });
+  }
+
+  function retryingAjax(ajaxOptions, maxRetries, timeoutMs) {
+        const thunk = () => ajaxPromise(ajaxOptions);
+        const retry = (fn, maxRetries, timeoutMs) => new Promise((resolve, reject) => {
+            fn()
+                .then(resolve)
+                .catch((e) => {
+                    if (maxRetries === 1 || (e.status && e.status !== 500)) {
+                        return reject(e);
+                    }
+                    console.log('retrying failed promise...');
+                    setTimeout(() => {
+                        retry(fn, maxRetries - 1, timeoutMs).then(resolve).catch(reject);
+                    }, timeoutMs);
+                })
+        });
+        return retry(thunk, maxRetries, timeoutMs);
+    }
+
+    async function makeApiRequest(ajaxOptions, maxRetries = 5, timeoutMs = 1000) {
+      try {
+        const res = await retryingAjax(ajaxOptions, maxRetries, timeoutMs);
+        return res;
+      } catch (e) {
+          if (e.status) {
+            // showAlert(`Request Failed with status code ${e.status}`);
+          } else {
+            // showAlert("Request Failed");
+          }
+          throw e;
+      }
+    }
+
+  class TalentRepository {
+    async findAll() {
+      const talents = await makeApiRequest({
+        type: 'GET',
+        url: '/api/talents/'
+      });
+      return talents;
+    }
+
+    async search(query) {
+      const talents = await makeApiRequest({
+        type: 'GET',
+        url: `/api/talents?query=${query}`
+      });
+      return talents;
+    }
+  }
+
+  const talentRepo = new TalentRepository();
+
+  talentRepo
+      .findAll()
+      .then(showTalents)
+      .catch(e => alert(e));
+
+  $("#talent-search-form").submit(function (e) {
+    e.preventDefault();
+
+    const query = $("#talent-search-query").text();
+    talentRepo.search(query)
+      .then(showTalents)
+      .catch(e => alert(e));
+
+  });
+</script>
 
 <%- include('partials/footer') %>
