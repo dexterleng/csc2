@@ -8,4 +8,14 @@ module.exports = {
   DB_NAME: process.env.DB_NAME,
   DB_USER: process.env.DB_USER,
   DB_PASSWORD: process.env.DB_PASSWORD,
+  S3_ACCESS_SECRET: process.env.S3_ACCESS_SECRET,
+  S3_ACCESS_KEY: process.env.S3_ACCESS_KEY,
+  S3_SESSION_TOKEN: process.env.S3_SESSION_TOKEN,
+  S3_REGION: process.env.S3_REGION,
+  S3_BUCKET: process.env.S3_BUCKET,
+
+  // To test Disqus in development, add localtest.me to the list of 'Trusted Domains' in https://<shortname>.disqus.com/admin/settings/advanced/
+  // localtest.me redirects to localhost.
+  // localhost doesn't work with disqus.
+  DISQUS_SHORTNAME: process.env.DISQUS_SHORTNAME
 }
