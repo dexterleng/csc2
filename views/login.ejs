@@ -1,0 +1,106 @@
+<%- include('partials/header') %>
+
+<div class="login-form">
+    <form id="form" action="">
+        <h2 class="text-center">Log in</h2>       
+        <div class="form-group">
+            <input id="username" type="text" class="form-control" placeholder="Username" required="required">
+        </div>
+        <div class="form-group">
+            <input id="password" type="password" class="form-control" placeholder="Password" required="required">
+        </div>
+        <div class="form-group sep">
+            <button id="login" type="submit" class="btn btn-primary btn-block">Login</button>
+            <button id="register" type="submit" class="btn btn-primary btn-block">Register</button>
+        </div>
+    </form>
+</div>
+
+<script>
+    const $username = $("#username");
+    const $password = $("#password");
+
+    function login(username, password)
+    {
+        return $.ajax({
+            url: "/api/users/login",
+            type: "post",
+            contentType: "application/json",
+            data: JSON.stringify({ username, password })
+        });
+    }
+
+    async function register(username, password)
+    {
+        return $.ajax({
+            url: "/api/users/register",
+            type: "post",
+            contentType: "application/json",
+            data: JSON.stringify({ username, password })
+        });
+    }
+
+    $("#form").submit(function(e) {
+        const username = $username.val();
+        const password = $password.val();
+        const isLogin = e.originalEvent.submitter.id === "login";
+
+        (async () => {
+            try
+            {
+                if (isLogin)
+                {
+                    await login(username, password);
+                    window.location.replace("/");
+                }
+                else
+                {
+                    await register(username, password);
+                    alert("Successfully registered");
+                }
+            }
+            catch (error)
+            {
+                alert(error.responseText);
+                console.log(error);
+            }
+        })();
+
+        e.preventDefault();
+        return false;
+    });
+</script>
+
+<style>
+    .login-form {
+		width: 340px;
+        margin: 50px auto;
+	}
+
+    .login-form form {
+        margin-bottom: 15px;
+        background: #f7f7f7;
+        box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.3);
+        padding: 30px;
+    }
+
+    .login-form h2 {
+        margin: 0 0 15px;
+    }
+
+    .form-control, .btn {
+        min-height: 38px;
+        border-radius: 2px;
+    }
+
+    .btn {        
+        font-size: 15px;
+        font-weight: bold;
+    }
+
+    .sep {
+        margin-top: 16px;
+    }
+</style>
+
+<%- include('partials/footer') %>
