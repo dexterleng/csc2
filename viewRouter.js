@@ -15,8 +15,7 @@ router.get('/talents/:id', function (req, res, next) {
     // localhost doesn't work with disqus.
     disqusUrl = req.protocol + '://' + 'localtest.me' + req.originalUrl;
   }
-
-  res.render('talent', {
+  res.render('talents/show', {
     talentId: req.params.id,
     disqusShortname: DISQUS_SHORTNAME,
     disqusUrl
