@@ -36,6 +36,13 @@ const uploadProfilePictureMiddleware = multerUpload.single('profile_picture')
 
 router.post('/talents/', uploadProfilePictureMiddleware, async (req, res, next) => {
   try {
+    if (!req.file) {
+      res.status(400).send({
+        message: "Please include the talent profile picture"
+      });
+      return;
+    }
+
     const profile_picture_disk_path = req.file.path;
     const { name, description } = req.body;
 

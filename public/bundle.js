@@ -53,4 +53,15 @@ class TalentRepository {
     });
     return talent;
   }
+
+  async insert(formData) {
+    const res = await makeApiRequest({
+      type: 'POST',
+      url: '/api/talents/',
+      data: formData,
+      contentType: false,
+      processData: false,
+    });
+    return res;
+  }
 }

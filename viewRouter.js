@@ -6,6 +6,10 @@ router.get('/', function (req, res, next) {
   res.render('index');
 })
 
+router.get('/talents/create', function(req, res, next) {
+  res.render('talents/create');
+})
+
 router.get('/talents/:id', function (req, res, next) {
   let disqusUrl = req.protocol + '://' + req.get('host') + req.originalUrl;
   const isDevelopment = process.env.NODE_ENV === null || process.env.NODE_ENV === undefined || process.env.NODE_ENV === 'development';
