@@ -4,9 +4,7 @@
 <% if (locals.user.type !== "premium") { %>
     <button id="checkout" class="btn btn-primary btn-block">Checkout</button>
 <% } else { %>
-    <form action="api/users/manage">
-        <button id="manage" type="submit" class="btn btn-primary btn-block">Manage billing</button>
-    </form>
+    <a id="manage" type="submit" class="btn btn-primary btn-block" href="api/users/manage">Manage billing</a>
 <% } %>
 
 <div id="login-history" style="white-space: pre"/>
