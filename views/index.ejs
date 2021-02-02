@@ -27,7 +27,8 @@
   $("#talent-search-form").submit(function (e) {
     e.preventDefault();
 
-    const query = $("#talent-search-query").text();
+    const query = $("#talent-search-query").val();
+    console.log(query);
 
     Promise.resolve()
       .then(() => setLoadingState())
