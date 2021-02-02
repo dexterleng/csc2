@@ -11,5 +11,15 @@ module.exports = {
   JWT_SECRET: process.env.JWT_SECRET,
   STRIPE_SECRET: process.env.STRIPE_SECRET,
   STRIPE_PUBLIC: process.env.STRIPE_PUBLIC,
-  STRIPE_PRODUCT_ID: process.env.STRIPE_PRODUCT_ID
+  STRIPE_PRODUCT_ID: process.env.STRIPE_PRODUCT_ID,
+  S3_ACCESS_SECRET: process.env.S3_ACCESS_SECRET,
+  S3_ACCESS_KEY: process.env.S3_ACCESS_KEY,
+  S3_SESSION_TOKEN: process.env.S3_SESSION_TOKEN,
+  S3_REGION: process.env.S3_REGION,
+  S3_BUCKET: process.env.S3_BUCKET,
+
+  // To test Disqus in development, add localtest.me to the list of 'Trusted Domains' in https://<shortname>.disqus.com/admin/settings/advanced/
+  // localtest.me redirects to localhost.
+  // localhost doesn't work with disqus.
+  DISQUS_SHORTNAME: process.env.DISQUS_SHORTNAME
 }

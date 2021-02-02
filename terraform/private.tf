@@ -37,6 +37,12 @@ resource "aws_security_group" "db" {
         protocol = "tcp"
         cidr_blocks = ["0.0.0.0/0"]
     }
+    egress {
+        from_port = 3306
+        to_port = 3306
+        protocol = "tcp"
+        cidr_blocks = [aws_security_group.web.id]
+    }
 
     vpc_id = aws_vpc.default.id
 
