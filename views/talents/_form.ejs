@@ -1,0 +1,25 @@
+<form id="talent-form">
+  <div class="input-group mb-3">
+    <div class="input-group-prepend">
+      <span class="input-group-text">Upload Talent Image</span>
+    </div>
+    <div class="custom-file">
+      <input name="profile_picture" type="file" class="custom-file-input" id="talent-profile-picture">
+      <label id='talent-profile-picture-label' class="custom-file-label" for="talent-profile-picture">Choose jpg, jpeg, or png</label>
+    </div>
+  </div>
+
+  <div class="form-group">
+    <label for="talent-name">Talent Name</label>
+    <input type="text" class="form-control" id="talent-name" name="name" placeholder="Enter talent name">
+  </div>
+  <div class="form-group">
+    <label for="talent-description">Description</label>
+    <textarea name="description" class="form-control" id="talent-description" rows="3" placeholder="Describe the talent! What does he/she/they do? What are their hobbies?"></textarea>
+  </div>
+  <div style='margin-top: 1rem;'>
+    <button id="submit-button" type="submit" class="btn btn-primary" style='display: inline;'>Submit</button>
+    <div class="spinner-border" role="status" id="spinner">
+  </div>
+  </div>
+</form>

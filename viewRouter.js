@@ -26,4 +26,10 @@ router.get('/talents/:id', function (req, res, next) {
   });
 })
 
+router.get('/talents/:id/edit', function(req, res, next) {
+  res.render('talents/edit', {
+    talentId: req.params.id,
+  });
+})
+
 module.exports = router;

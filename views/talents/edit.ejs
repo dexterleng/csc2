@@ -1,0 +1,122 @@
+<%- include('../partials/header') %>
+
+<div id="alerts-container" style='margin-top: 1rem;'>
+
+</div>
+
+<h1 style='margin-top: 1rem;'>Update Talent</h1>
+
+<%- include('_form') %>
+
+<%- include('../partials/footer') %>
+
+<script>
+    const talentId = "<%= talentId %>";
+    const talentRepository = new TalentRepository();
+
+    Promise.resolve()
+      .then(disableForm)
+      .then(() => talentRepository.find(talentId))
+      .then(hydrateForm)
+      .then(enableForm)
+      .catch(handleHydrateError);
+
+    $("#spinner").hide();
+
+    $("#talent-form").submit(function (e) {
+      e.preventDefault();
+
+      Promise.resolve()
+        .then(() => setLoadingState())
+        .then(() => talentRepository.update(talentId, new FormData(document.getElementById('talent-form'))))
+        .then(() => redirectToHomePage())
+        .catch(handleSubmitError);
+
+    });
+
+    $('#talent-profile-picture').on('change',function(){
+      //get the file name
+      var fileName = $(this).val().replace('C:\\fakepath\\', " ");
+      //replace the "Choose a file" label
+      $(this).next('#talent-profile-picture-label').html(fileName);
+    })
+
+    function hydrateForm({ name, description }) {
+      $("#talent-name").val(name);
+      $("#talent-description").val(description);
+    }
+
+    // https://stackoverflow.com/a/3387116/10390454
+    function disableForm() {
+      var form = document.getElementById("talent-form");
+      var elements = form.elements;
+      for (var i = 0, len = elements.length; i < len; ++i) {
+          elements[i].disabled = true;
+      }
+    }
+
+    function enableForm() {
+      var form = document.getElementById("talent-form");
+      var elements = form.elements;
+      for (var i = 0, len = elements.length; i < len; ++i) {
+          elements[i].disabled = false;
+      }
+    }
+
+    function setLoadingState() {
+      $("#spinner").show()
+      $("#submit-button").prop('disabled', true);
+    }
+
+    function handleHydrateError(e) {
+      showErrorAlerts(e);
+    }
+
+    function handleSubmitError(e) {
+      console.log(e);
+      $("#spinner").hide()
+      $("#submit-button").prop('disabled', false);
+
+      showErrorAlerts(e);
+    }
+
+    function showErrorAlerts(e) {
+      const messages = [];
+
+      if (e.responseJSON && e.responseJSON.message) {
+        messages.push(e.responseJSON.message);
+      }
+
+      // validation errors
+      if (e.responseJSON && e.responseJSON.errors) {
+        for (let error of errors) {
+          messages.push(error);
+        }
+      }
+
+      if (messages.length === 0) {
+        let message = "Something went wrong."
+
+        if (e.status) {
+          message = `Network request failed with status ${e.status}`
+        }
+
+        messages.push(message);
+      }
+
+      $("#alerts-container").empty();
+      $("#alerts-container").append(
+        messages.map(m => `
+          <div class="alert alert-danger" role="alert">
+            ${m}
+          </div>
+        `)
+      );
+    }
+
+    function redirectToHomePage() {
+      window.location.replace('/');
+    }
+
+
+</script>
