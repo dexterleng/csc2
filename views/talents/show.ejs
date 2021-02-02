@@ -1,10 +1,17 @@
 <%- include('../partials/header') %>
 
+<style>
+  .card-horizontal {
+    display: flex;
+    flex: 1 1 auto;
+  }
+</style>
+
 <div id="talent-container">
 
 </div>
 
-<div id="disqus_thread"></div>
+<div id="disqus_thread" style="margin-top: 1rem;"></div>
 
 <script>
   const talentId = "<%= talentId %>";
@@ -14,7 +21,21 @@
       .then(() => setLoadingState())
       .then(() => talentRepo.find(talentId))
       .then(showTalent)
-      .catch(showError);
+      .catch(showErrorAsAlerts);
+
+  $(document).on('click', '#delete-talent-button', async () => {
+    const shouldDelete = confirm("Are you sure you want to delete the talent?");
+    if (!shouldDelete) {
+      return;
+    }
+
+    try {
+      await talentRepo.delete(talentId);
+      redirectToHomePage();
+    } catch (e) {
+      showErrorAsAlerts(e);
+    }
+  });
 
   function setLoadingState() {
     $("#talent-container").empty();
@@ -27,12 +48,18 @@
   // TODO: cut off description beyond a certain length
   function renderTalentCard(talent) {
     return `
-<div class="card" style="width: 20rem;">
-  <img class="card-img-top" src="${talent.profile_picture_url}">
-  <div class="card-body">
-    <h5 class="card-title">${talent.name}</h5>
-    <p class="card-text">${talent.description}</p>
-    <a href="/talents/${talent.id}" class="btn btn-primary">View Profile</a>
+<div class="card">
+  <div class="card-horizontal">
+    <div>
+      <img class="card-img-top" src="${talent.profile_picture_url}" style="width: 400px; height: 400px;">
+    </div>
+    <div class="card-body">
+      <h5 class="card-title">${talent.name}</h5>
+      <p class="card-text">${talent.description}</p>
+      
+      <a href="/talents/${talent.id}/edit" class="btn btn-primary">Edit Profile</a>
+      <button id="delete-talent-button" class="btn btn-danger">Delete Profile</a>
+    </div>
   </div>
 </div>
     `;
@@ -43,20 +70,10 @@
     $("#talent-container").append(renderTalentCard(talent));
   }
 
-  function showError(e) {
-    let message = "Something went wrong."
-
-    if (e.status) {
-      message = `Network request failed with status ${e.status}`
-    }
-
-    $("#talent-container").empty();
-    $("#talent-container").append(`
-      <div class="alert alert-danger" role="alert">
-        ${message}
-      </div>
-    `);
+  function redirectToHomePage() {
+    window.location.replace('/');
   }
+
 </script>
 
 <script>

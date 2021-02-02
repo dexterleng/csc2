@@ -131,4 +131,11 @@ class TalentRepository {
     });
     return res;
   }
+
+  async delete(id) {
+    await makeApiRequest({
+      type: 'DELETE',
+      url: `/api/talents/${id}`
+    });
+  }
 }
