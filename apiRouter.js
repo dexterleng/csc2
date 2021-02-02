@@ -98,14 +98,14 @@ router.put('/talents/:id', uploadProfilePictureMiddleware, async (req, res, next
 
 router.get('/talents/', async (req, res, next) => {
   try {
-    const { query } = req.query;
+    const { query, limit, offset } = req.query;
 
     let talents;
 
     if (query) {
-      talents = await TalentRepository.search(query);
+      talents = await TalentRepository.search({ query, limit, offset});
     } else {
-      talents = await TalentRepository.findAll();
+      talents = await TalentRepository.findAll({ limit, offset });
     }
 
     const talentsWithS3PresignedUrl = talents.map(talent => {
