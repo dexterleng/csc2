@@ -13,15 +13,20 @@
   "dependencies": {
     "algoliasearch": "^4.8.4",
     "aws-sdk": "^2.830.0",
+    "bcrypt": "^5.0.0",
     "clarifai-nodejs-grpc": "^7.0.3",
+    "cookie-parser": "^1.4.5",
     "dotenv": "^8.2.0",
     "ejs": "^3.1.5",
     "express": "^4.17.1",
-    "swagger-jsdoc": "^6.0.1",
-    "swagger-ui-express": "^4.1.6",
-    "multer": "^1.4.2",
+    "express-useragent": "^1.0.15",
+    "jsonwebtoken": "^8.5.1",
     "knex": "^0.21.16",
+    "multer": "^1.4.2",
     "multer-s3": "^2.9.0",
-    "mysql2": "^2.2.5"
+    "mysql2": "^2.2.5",
+    "stripe": "^8.132.0",
+    "swagger-jsdoc": "^6.0.1",
+    "swagger-ui-express": "^4.1.6"
   }
 }

@@ -1,9 +1,27 @@
 const express = require('express');
-const { DISQUS_SHORTNAME } = require('./env_constants');
+const { DISQUS_SHORTNAME, STRIPE_PUBLIC } = require('./env_constants');
+const auth = require("./middleware/auth");
 const router = express.Router()
 
-router.get('/', function (req, res, next) {
-  res.render('index');
+const authHandler = shouldFindSession => (req, res, next) => {
+  if (!res.locals.user === shouldFindSession)
+    return res.redirect("home");
+  next();
+};
+
+const injectGlobal = (req, res, next) => {
+  res.locals.env = process.env;
+  next();
+};
+
+router.use(auth({ deferHandle: true }), injectGlobal);
+
+router.use("/login", authHandler(false), (req, res) => res.render("login"));
+
+router.use("/account", authHandler(true), (req, res) => res.render("account"));
+
+router.use('/', function (req, res, next) {
+  res.render('index', { user: res.locals.user });
 })
 
 router.get('/talents/create', function(req, res, next) {
@@ -22,7 +40,8 @@ router.get('/talents/:id', function (req, res, next) {
   res.render('talents/show', {
     talentId: req.params.id,
     disqusShortname: DISQUS_SHORTNAME,
-    disqusUrl
+    disqusUrl,
+    user: res.locals.user
   });
 })
 

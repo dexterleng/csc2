@@ -1,0 +1,37 @@
+<%- include('partials/header') %>
+
+<span><%=locals.user.type%> user</span><br>
+<% if (locals.user.type !== "premium") { %>
+    <button id="checkout" class="btn btn-primary btn-block">Checkout</button>
+<% } else { %>
+    <a id="manage" type="submit" class="btn btn-primary btn-block" href="api/users/manage">Manage billing</a>
+<% } %>
+
+<div id="login-history" style="white-space: pre"/>
+
+<script>
+    const stripe = Stripe("<%=locals.env.STRIPE_PUBLIC%>");
+    
+    $("#checkout").click(e => {
+        (async () => {
+            try
+            {
+                const session = await User.checkout();
+                stripe.redirectToCheckout({ sessionId: session.id });
+            }
+            catch (error)
+            {
+                console.log(error);
+            }
+        })();
+    });
+
+    (async () => {
+        const history = await User.getHistory();
+
+        $("#login-history").text(JSON.stringify(history, null, 2));
+    })();
+
+</script>
+
+<%- include('partials/footer') %>

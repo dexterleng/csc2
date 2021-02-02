@@ -13,6 +13,11 @@ const options = {
     apis: ["./*.js"]
 }
 
+if (process.env.NODE_ENV !== "production")
+{
+    process.env.API_GATEWAY_URL = "";
+}
+
 const swaggerSpec = swaggerJSDoc(options);
 
 const app = express();

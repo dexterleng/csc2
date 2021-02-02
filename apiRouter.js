@@ -28,11 +28,9 @@ router.use('/healthcheck', function (req, res, next) {
     res.status(200).send('API Healthy');
 });
 
-router.get('/healthcheck', function (req, res, next) {
-  res.status(200).send('API Healthy');
-})
-
 const uploadProfilePictureMiddleware = multerUpload.single('profile_picture')
+
+router.use("/users", require("./controllers/users"));
 
 router.post('/talents/', uploadProfilePictureMiddleware, async (req, res, next) => {
   try {

@@ -1,3 +1,40 @@
 </div>
 </body>
+<script>
+    $("#logout").click(e => {
+        document.cookie = "token=; Max-Age=0; path=/;";
+        window.location.replace("home");
+    });
+    
+    function getCookie(cname) {
+        var name = cname + "=";
+        var decodedCookie = decodeURIComponent(document.cookie);
+        var ca = decodedCookie.split(';');
+        for(var i = 0; i <ca.length; i++) {
+            var c = ca[i];
+            while (c.charAt(0) == ' ') {
+                c = c.substring(1);
+            }
+            if (c.indexOf(name) == 0) {
+                return c.substring(name.length, c.length);
+            }
+        }
+        return "";
+    } 
+
+    // refresh subscription in token
+    (async () => {
+        if (getCookie("token"))
+        {
+            try
+            {
+                await User.getSubscription();
+            }
+            catch (error)
+            {
+                console.log("failed to refresh subcription", error);
+            }
+        }
+    })();
+</script>
 </html>
