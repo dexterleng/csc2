@@ -4,13 +4,12 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const dynamodb = require("../lib/dynamodb");
 const { stripe, getSubscription } = require("../lib/stripe");
+const useragent = require('express-useragent');
 
 const config = require("../config");
 const { JWT_SECRET, STRIPE_PRODUCT_ID } = require("../env_constants");
 
 const router = express.Router();
-
-// const emailRegex = /(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9]))\.){3}(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9])|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])/;
 
 router.use(express.json());
 
@@ -57,7 +56,7 @@ router.post("/register", async (req, res) => {
 });
 
 // login
-router.post("/login", async (req ,res) => {
+router.post("/login", useragent.express(), async (req ,res) => {
     const { username, password } = req.body;
 
     try
@@ -73,6 +72,17 @@ router.post("/login", async (req ,res) => {
         const passwordMatches = await bcrypt.compare(password, user.passwordHash);
         if (!passwordMatches)
             return res.status(403).send("Invalid username or password");
+
+        // add current session data
+        await dynamodb.createTableData({
+            TableName: "userSessions",
+            Item: {
+                username,
+                timestamp: new Date(Date.now()).toISOString(),
+                ip: req.headers["x-forwarded-for"] || req.connection.remoteAddress,
+                agent: JSON.stringify(req.useragent)
+            }
+        });
 
         const { subscription, currentPlan } = await getSubscription(user.stripeCustomerId);
 
@@ -97,7 +107,6 @@ router.get("/subscription", auth(), async (req, res) => {
     res.clearCookie("token");
     
     const user = res.locals.user;
-    console.log();
     
     const { currentPlan } = await getSubscription(user.stripeCustomerId);
     
