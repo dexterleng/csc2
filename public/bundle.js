@@ -114,7 +114,7 @@ class TalentRepository {
   async update(id, formData) {
     return await makeApiRequest({
       type: 'PUT',
-      url: `/api/talents/${id}`,
+      url: `api/talents/${id}`,
       data: formData,
       contentType: false,
       processData: false,
@@ -124,7 +124,7 @@ class TalentRepository {
   async insert(formData) {
     const res = await makeApiRequest({
       type: 'POST',
-      url: '/api/talents/',
+      url: 'api/talents/',
       data: formData,
       contentType: false,
       processData: false,
