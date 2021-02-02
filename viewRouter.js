@@ -5,15 +5,20 @@ const router = express.Router()
 
 const authHandler = shouldFindSession => (req, res, next) => {
   if (!res.locals.user === shouldFindSession)
-    return res.redirect("/");
+    return res.redirect("home");
   next();
 };
 
-router.use(auth({ deferHandle: true }));
+const injectGlobal = (req, res, next) => {
+  res.locals.env = process.env;
+  next();
+};
 
-router.use("/login", authHandler(false), (req, res) => res.render("login", { user: res.locals.user }));
+router.use(auth({ deferHandle: true }), injectGlobal);
 
-router.use("/account", authHandler(true), (req, res) => res.render("account", { STRIPE_PUBLIC, user: res.locals.user }));
+router.use("/login", authHandler(false), (req, res) => res.render("login"));
+
+router.use("/account", authHandler(true), (req, res) => res.render("account"));
 
 router.use('/', function (req, res, next) {
   res.render('index', { user: res.locals.user });

@@ -23,7 +23,7 @@
     function login(username, password)
     {
         return $.ajax({
-            url: "/api/users/login",
+            url: "api/users/login",
             type: "post",
             contentType: "application/json",
             data: JSON.stringify({ username, password })
@@ -33,7 +33,7 @@
     async function register(username, password)
     {
         return $.ajax({
-            url: "/api/users/register",
+            url: "api/users/register",
             type: "post",
             contentType: "application/json",
             data: JSON.stringify({ username, password })
@@ -51,7 +51,7 @@
                 if (isLogin)
                 {
                     await login(username, password);
-                    window.location.replace("/");
+                    window.location.replace("home");
                 }
                 else
                 {

@@ -1,10 +1,10 @@
 <%- include('partials/header') %>
 
-<span><%=user.type%> user</span><br>
-<% if (user.type !== "premium") { %>
+<span><%=locals.user.type%> user</span><br>
+<% if (locals.user.type !== "premium") { %>
     <button id="checkout" class="btn btn-primary btn-block">Checkout</button>
 <% } else { %>
-    <form action="/api/users/manage">
+    <form action="api/users/manage">
         <button id="manage" type="submit" class="btn btn-primary btn-block">Manage billing</button>
     </form>
 <% } %>
@@ -12,12 +12,12 @@
 <div id="login-history" style="white-space: pre"/>
 
 <script>
-    const stripe = Stripe("<%=STRIPE_PUBLIC%>");
+    const stripe = Stripe("<%=locals.env.STRIPE_PUBLIC%>");
     
     function checkout()
     {
         return $.ajax({
-            url: "/api/users/checkout",
+            url: "api/users/checkout",
             type: "get"
         });
     }
@@ -38,7 +38,7 @@
 
     (async () => {
         const history = await $.ajax({
-            url: "/api/users/history",
+            url: "api/users/history",
             type: "get"
         });
 

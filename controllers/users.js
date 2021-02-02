@@ -119,7 +119,7 @@ router.get("/subscription", auth(), async (req, res) => {
 })
 
 router.get("/checkout", auth(), async (req, res) => {
-    const host = `http://${req.get("Host")}`;
+    const host = process.env.API_GATEWAY_URL || `http://${req.get("Host")}`;
     const user = res.locals.user;
 
     try
@@ -143,7 +143,7 @@ router.get("/checkout", auth(), async (req, res) => {
 })
 
 router.get("/manage", auth(), async (req, res) => {
-    const host = `http://${req.get("Host")}`;
+    const host = process.env.API_GATEWAY_URL || `http://${req.get("Host")}`;
     const user = res.locals.user;
 
     try
