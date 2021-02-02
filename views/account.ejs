@@ -14,19 +14,11 @@
 <script>
     const stripe = Stripe("<%=locals.env.STRIPE_PUBLIC%>");
     
-    function checkout()
-    {
-        return $.ajax({
-            url: "api/users/checkout",
-            type: "get"
-        });
-    }
-
     $("#checkout").click(e => {
         (async () => {
             try
             {
-                const session = await checkout();
+                const session = await User.checkout();
                 stripe.redirectToCheckout({ sessionId: session.id });
             }
             catch (error)
@@ -37,10 +29,7 @@
     });
 
     (async () => {
-        const history = await $.ajax({
-            url: "api/users/history",
-            type: "get"
-        });
+        const history = await User.getHistory();
 
         $("#login-history").text(JSON.stringify(history, null, 2));
     })();

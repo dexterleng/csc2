@@ -2,8 +2,8 @@
 </body>
 <script>
     $("#logout").click(e => {
-        document.cookie = "token=; Max-Age=0";
-        location.reload();
+        document.cookie = "token=; Max-Age=0; path=/;";
+        window.location.replace("home");
     });
     
     function getCookie(cname) {
@@ -28,10 +28,7 @@
         {
             try
             {
-                await $.ajax({
-                    url: "api/users/subscription",
-                    type: "get"
-                });
+                await User.getSubscription();
             }
             catch (error)
             {

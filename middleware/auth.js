@@ -18,6 +18,7 @@ function auth({ deferHandle = false } = {})
         }
         catch (error)
         {
+            res.clearCookie("token");
             if (!deferHandle)
                 return res.status(403).send();
         }

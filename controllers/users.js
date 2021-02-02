@@ -93,7 +93,11 @@ router.post("/login", useragent.express(), async (req ,res) => {
         }, JWT_SECRET, config.jwt);
         
         res.clearCookie("token");
-        res.cookie("token", token, { expires: new Date(Date.now() + config.jwt.expiresIn * 1000), overwrite: true }).send();
+        
+        // bugged when running on server
+        // const dt = new Date();
+        // dt.setSeconds(dt.getSeconds() + config.jwt.expiresIn);
+        res.cookie("token", token, { overwrite: true }).send();
     }
     catch (error)
     {
@@ -115,11 +119,11 @@ router.get("/subscription", auth(), async (req, res) => {
         type: currentPlan
     }, JWT_SECRET, { mutatePayload: true });
 
-    res.cookie("token", token, { expires: new Date(user.exp * 1000) }).send();
+    res.cookie("token", token, { overwrite: true }).send();
 })
 
 router.get("/checkout", auth(), async (req, res) => {
-    const host = process.env.API_GATEWAY_URL || `http://${req.get("Host")}`;
+    const host = (process.env.API_GATEWAY_URL && `${process.env.API_GATEWAY_URL}/home`) || `http://${req.get("Host")}`;
     const user = res.locals.user;
 
     try
@@ -143,7 +147,7 @@ router.get("/checkout", auth(), async (req, res) => {
 })
 
 router.get("/manage", auth(), async (req, res) => {
-    const host = process.env.API_GATEWAY_URL || `http://${req.get("Host")}`;
+    const host = (process.env.API_GATEWAY_URL && `${process.env.API_GATEWAY_URL}/home`) || `http://${req.get("Host")}`;
     const user = res.locals.user;
 
     try

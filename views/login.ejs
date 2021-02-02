@@ -20,26 +20,6 @@
     const $username = $("#username");
     const $password = $("#password");
 
-    function login(username, password)
-    {
-        return $.ajax({
-            url: "api/users/login",
-            type: "post",
-            contentType: "application/json",
-            data: JSON.stringify({ username, password })
-        });
-    }
-
-    async function register(username, password)
-    {
-        return $.ajax({
-            url: "api/users/register",
-            type: "post",
-            contentType: "application/json",
-            data: JSON.stringify({ username, password })
-        });
-    }
-
     $("#form").submit(function(e) {
         const username = $username.val();
         const password = $password.val();
@@ -50,12 +30,12 @@
             {
                 if (isLogin)
                 {
-                    await login(username, password);
+                    await User.login(username, password);
                     window.location.replace("home");
                 }
                 else
                 {
-                    await register(username, password);
+                    await User.register(username, password);
                     alert("Successfully registered");
                 }
             }
