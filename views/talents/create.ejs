@@ -1,0 +1,50 @@
+<%- include('../partials/header') %>
+
+<style>
+  .form-group {
+    margin-top: 1rem;
+  }
+</style>
+
+<h1 style='margin-top: 1rem;'>Submit a Talent</h1>
+
+<%- include('_form') %>
+
+<script>
+  const talentRepository = new TalentRepository();
+
+  $("#talent-form").submit(function (e) {
+    e.preventDefault();
+
+    Promise.resolve()
+      .then(() => disableForm('talent-form'))
+      .then(() => talentRepository.insert(new FormData(document.getElementById('talent-form'))))
+      .then(() => redirectToHomePage())
+      .catch((e) => {
+        enableForm('talent-form');
+        showErrorAsAlerts(e);
+      });
+
+  });
+
+  $('#talent-profile-picture').on('change',function(){
+    //get the file name
+    var fileName = $(this).val().replace('C:\\fakepath\\', " ");
+    //replace the "Choose a file" label
+    $(this).next('#talent-profile-picture-label').html(fileName);
+  })
+
+  function isImage() {
+      var fileName = document.getElementById('receipt').value;
+      var idxDot = fileName.lastIndexOf(".") + 1;
+      var extFile = fileName.substr(idxDot, fileName.length).toLowerCase();
+      return extFile == "jpg" || extFile == "jpeg" || extFile == "png";
+  }
+
+  function redirectToHomePage() {
+    window.location.replace('/');
+  }
+
+</script>
+
+<%- include('../partials/footer') %>

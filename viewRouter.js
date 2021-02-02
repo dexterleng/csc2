@@ -24,6 +24,10 @@ router.use('/', function (req, res, next) {
   res.render('index', { user: res.locals.user });
 })
 
+router.get('/talents/create', function(req, res, next) {
+  res.render('talents/create');
+})
+
 router.get('/talents/:id', function (req, res, next) {
   let disqusUrl = req.protocol + '://' + req.get('host') + req.originalUrl;
   const isDevelopment = process.env.NODE_ENV === null || process.env.NODE_ENV === undefined || process.env.NODE_ENV === 'development';
@@ -38,6 +42,12 @@ router.get('/talents/:id', function (req, res, next) {
     disqusShortname: DISQUS_SHORTNAME,
     disqusUrl,
     user: res.locals.user
+  });
+})
+
+router.get('/talents/:id/edit', function(req, res, next) {
+  res.render('talents/edit', {
+    talentId: req.params.id,
   });
 })
 

@@ -34,6 +34,13 @@ router.use("/users", require("./controllers/users"));
 
 router.post('/talents/', uploadProfilePictureMiddleware, async (req, res, next) => {
   try {
+    if (!req.file) {
+      res.status(400).send({
+        message: "Please include the talent profile picture"
+      });
+      return;
+    }
+
     const profile_picture_disk_path = req.file.path;
     const { name, description } = req.body;
 
@@ -59,6 +66,13 @@ router.post('/talents/', uploadProfilePictureMiddleware, async (req, res, next) 
 
 router.put('/talents/:id', uploadProfilePictureMiddleware, async (req, res, next) => {
   try {
+    if (!req.file) {
+      res.status(400).send({
+        message: "Please include the talent profile picture"
+      });
+      return;
+    }
+
     const { id } = req.params;
     const profile_picture_disk_path = req.file.path;
     const { name, description } = req.body;

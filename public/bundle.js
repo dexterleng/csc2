@@ -1,3 +1,60 @@
+function showErrorAsAlerts(e) {
+  const messages = [];
+
+  if (e.responseJSON && e.responseJSON.message) {
+    messages.push(e.responseJSON.message);
+  }
+
+  // validation errors
+  if (e.responseJSON && e.responseJSON.errors) {
+    for (let error of errors) {
+      messages.push(error);
+    }
+  }
+
+  if (messages.length === 0) {
+    let message = "Something went wrong."
+
+    if (e.status) {
+      message = `Network request failed with status ${e.status}`
+    }
+
+    messages.push(message);
+  }
+
+  $("#alerts-container").empty();
+  $("#alerts-container").append(
+    messages.map(m => `
+      <div class="alert alert-danger" role="alert">
+        ${m}
+      </div>
+    `)
+  );
+}
+
+// https://stackoverflow.com/a/3387116/10390454
+function disableForm(id) {
+  var form = document.getElementById(id);
+  var elements = form.elements;
+  for (var i = 0, len = elements.length; i < len; ++i) {
+      elements[i].readOnly = true;
+      if (elements[i].nodeName === "BUTTON") {
+        elements[i].disabled = true;
+      }
+  }
+}
+
+function enableForm(id) {
+  var form = document.getElementById(id);
+  var elements = form.elements;
+  for (var i = 0, len = elements.length; i < len; ++i) {
+    elements[i].readOnly = false;
+    if (elements[i].nodeName === "BUTTON") {
+      elements[i].disabled = false;
+    }
+  }
+}
+
 function ajaxPromise(ajaxOptions) {
   return new Promise((resolve, reject) => {
     $.ajax(ajaxOptions)
@@ -52,6 +109,27 @@ class TalentRepository {
       url: `api/talents/${id}`
     });
     return talent;
+  }
+
+  async update(id, formData) {
+    return await makeApiRequest({
+      type: 'PUT',
+      url: `/api/talents/${id}`,
+      data: formData,
+      contentType: false,
+      processData: false,
+    })
+  }
+
+  async insert(formData) {
+    const res = await makeApiRequest({
+      type: 'POST',
+      url: '/api/talents/',
+      data: formData,
+      contentType: false,
+      processData: false,
+    });
+    return res;
   }
 }
 

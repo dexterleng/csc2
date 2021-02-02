@@ -37,18 +37,18 @@ resource "aws_api_gateway_integration" "default" {
     http_method = aws_api_gateway_method.default.http_method
 
     type = "HTTP_PROXY"
-    uri = "http://${aws_lb.nlb.dns_name}/api/{proxy}"
+    uri = "http://${aws_lb.nlb.dns_name}/{proxy}"
     integration_http_method = "ANY"
 
     connection_type = "VPC_LINK"
     connection_id = aws_api_gateway_vpc_link.apigateway.id
 
-    # cache_key_parameters = ["method.request.path.proxy"]
+    cache_key_parameters = ["method.request.path.proxy"]
 
     # timeout_milliseconds = 29000
-    # request_parameters = {
-    #     "integration.request.path.proxy" = "method.request.path.proxy"
-    # }
+    request_parameters = {
+        "integration.request.path.proxy" = "method.request.path.proxy"
+    }
 
 }
 

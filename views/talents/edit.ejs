@@ -1,0 +1,54 @@
+<%- include('../partials/header') %>
+
+<h1 style='margin-top: 1rem;'>Update Talent</h1>
+
+<%- include('_form') %>
+
+<%- include('../partials/footer') %>
+
+<script>
+    const talentId = "<%= talentId %>";
+    const talentRepository = new TalentRepository();
+
+    Promise.resolve()
+      .then(() => disableForm('talent-form'))
+      .then(() => talentRepository.find(talentId))
+      .then(hydrateForm)
+      .then(() => enableForm('talent-form'))
+      .catch((e) => {
+        enableForm('talent-form');
+        showErrorAsAlerts(e);
+      });
+
+    $("#talent-form").submit(function (e) {
+      e.preventDefault();
+
+      Promise.resolve()
+        .then(() => disableForm('talent-form'))
+        .then(() => talentRepository.update(talentId, new FormData(document.getElementById('talent-form'))))
+        .then(() => redirectToHomePage())
+        .catch((e) => {
+          enableForm('talent-form');
+          showErrorAsAlerts(e);
+        });
+
+    });
+
+    $('#talent-profile-picture').on('change',function(){
+      //get the file name
+      var fileName = $(this).val().replace('C:\\fakepath\\', " ");
+      //replace the "Choose a file" label
+      $(this).next('#talent-profile-picture-label').html(fileName);
+    })
+
+    function hydrateForm({ name, description }) {
+      $("#talent-name").val(name);
+      $("#talent-description").val(description);
+    }
+
+    function redirectToHomePage() {
+      window.location.replace('/');
+    }
+
+
+</script>

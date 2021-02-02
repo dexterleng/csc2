@@ -41,7 +41,7 @@ resource "aws_security_group" "db" {
         from_port = 3306
         to_port = 3306
         protocol = "tcp"
-        cidr_blocks = [aws_security_group.web.id]
+        security_groups = [aws_security_group.web.id]
     }
 
     vpc_id = aws_vpc.default.id
