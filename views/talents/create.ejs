@@ -6,10 +6,6 @@
   }
 </style>
 
-<div id="alerts-container" style='margin-top: 1rem;'>
-
-</div>
-
 <h1 style='margin-top: 1rem;'>Submit a Talent</h1>
 
 <%- include('_form') %>
@@ -17,16 +13,17 @@
 <script>
   const talentRepository = new TalentRepository();
 
-  $("#spinner").hide();
-
   $("#talent-form").submit(function (e) {
     e.preventDefault();
 
     Promise.resolve()
-      .then(() => setLoadingState())
+      .then(() => disableForm('talent-form'))
       .then(() => talentRepository.insert(new FormData(document.getElementById('talent-form'))))
       .then(() => redirectToHomePage())
-      .catch(handleError);
+      .catch((e) => {
+        enableForm('talent-form');
+        showErrorAsAlerts(e);
+      });
 
   });
 
@@ -37,48 +34,6 @@
     $(this).next('#talent-profile-picture-label').html(fileName);
   })
 
-  function setLoadingState() {
-    $("#spinner").show()
-    $("#submit-button").prop('disabled', true);
-  }
-
-  function handleError(e) {
-    $("#spinner").hide()
-    $("#submit-button").prop('disabled', false);
-
-    const messages = [];
-
-    if (e.responseJSON && e.responseJSON.message) {
-      messages.push(e.responseJSON.message);
-    }
-
-    // validation errors
-    if (e.responseJSON && e.responseJSON.errors) {
-      for (let error of errors) {
-        messages.push(error);
-      }
-    }
-
-    if (messages.length === 0) {
-      let message = "Something went wrong."
-
-      if (e.status) {
-        message = `Network request failed with status ${e.status}`
-      }
-
-      messages.push(message);
-    }
-
-    $("#alerts-container").empty();
-    $("#alerts-container").append(
-      messages.map(m => `
-        <div class="alert alert-danger" role="alert">
-          ${m}
-        </div>
-      `)
-    );
-  }
-  
   function isImage() {
       var fileName = document.getElementById('receipt').value;
       var idxDot = fileName.lastIndexOf(".") + 1;
@@ -89,8 +44,6 @@
   function redirectToHomePage() {
     window.location.replace('/');
   }
-
-
 
 </script>
 
