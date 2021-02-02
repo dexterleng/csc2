@@ -1,0 +1,40 @@
+<%- include('partials/header') %>
+
+<span><%=user.type%> user</span><br>
+<% if (user.type !== "premium") { %>
+    <button id="checkout" class="btn btn-primary btn-block">Checkout</button>
+<% } else { %>
+    <form action="/api/users/manage">
+        <button id="manage" type="submit" class="btn btn-primary btn-block">Manage billing</button>
+    </form>
+<% } %>
+
+
+<script>
+    const stripe = Stripe("<%=STRIPE_PUBLIC%>");
+    
+    function checkout()
+    {
+        return $.ajax({
+            url: "/api/users/checkout",
+            type: "get"
+        });
+    }
+    
+    $("#checkout").click(e => {
+        (async () => {
+            try
+            {
+                const session = await checkout();
+                stripe.redirectToCheckout({ sessionId: session.id });
+            }
+            catch (error)
+            {
+                console.log(error);
+            }
+        })();
+    });
+
+</script>
+
+<%- include('partials/footer') %>

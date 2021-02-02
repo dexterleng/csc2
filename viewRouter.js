@@ -1,12 +1,22 @@
 const express = require('express');
-const { DISQUS_SHORTNAME } = require('./env_constants');
+const { DISQUS_SHORTNAME, STRIPE_PUBLIC } = require('./env_constants');
+const auth = require("./middleware/auth");
 const router = express.Router()
-const { STRIPE_PUBLIC } = require("./env_constants");
 
-router.use("/login", (req, res) => res.render("login"));
+const authHandler = shouldFindSession => (req, res, next) => {
+  if (!res.locals.user === shouldFindSession)
+    return res.redirect("/");
+  next();
+};
+
+router.use(auth({ deferHandle: true }));
+
+router.use("/login", authHandler(false), (req, res) => res.render("login", { user: res.locals.user }));
+
+router.use("/account", authHandler(true), (req, res) => res.render("account", { STRIPE_PUBLIC, user: res.locals.user }));
 
 router.use('/', function (req, res, next) {
-  res.render('index', { STRIPE_PUBLIC });
+  res.render('index', { user: res.locals.user });
 })
 
 router.get('/talents/:id', function (req, res, next) {
@@ -21,7 +31,8 @@ router.get('/talents/:id', function (req, res, next) {
   res.render('talents/show', {
     talentId: req.params.id,
     disqusShortname: DISQUS_SHORTNAME,
-    disqusUrl
+    disqusUrl,
+    user: res.locals.user
   });
 })
 

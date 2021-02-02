@@ -3,7 +3,7 @@ const auth = require("../middleware/auth");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const dynamodb = require("../lib/dynamodb");
-const { stripe } = require("../lib/stripe");
+const { stripe, getSubscription } = require("../lib/stripe");
 
 const config = require("../config");
 const { JWT_SECRET, STRIPE_PRODUCT_ID } = require("../env_constants");
@@ -74,15 +74,7 @@ router.post("/login", async (req ,res) => {
         if (!passwordMatches)
             return res.status(403).send("Invalid username or password");
 
-        const subscription = (await stripe.subscriptions.list({
-            customer: user.stripeCustomerId,
-            limit: 1
-        })).data[0];
-
-        if (subscription)
-            console.log(subscription.status)
-
-        const currentPlan = (subscription && (subscription.status === "active")) ? "premium" : "free";
+        const { subscription, currentPlan } = await getSubscription(user.stripeCustomerId);
 
         const token = jwt.sign({
             username,
@@ -90,7 +82,8 @@ router.post("/login", async (req ,res) => {
             type: currentPlan
         }, JWT_SECRET, config.jwt);
         
-        res.cookie("token", token, { expires: new Date(Date.now() + config.jwt.expiresIn * 1000) }).send();
+        res.clearCookie("token");
+        res.cookie("token", token, { expires: new Date(Date.now() + config.jwt.expiresIn * 1000), overwrite: true }).send();
     }
     catch (error)
     {
@@ -99,6 +92,22 @@ router.post("/login", async (req ,res) => {
     }
     
 });
+
+router.get("/subscription", auth(), async (req, res) => {
+    res.clearCookie("token");
+    
+    const user = res.locals.user;
+    console.log();
+    
+    const { currentPlan } = await getSubscription(user.stripeCustomerId);
+    
+    const token = jwt.sign({
+        ...res.locals.user,
+        type: currentPlan
+    }, JWT_SECRET, { mutatePayload: true });
+
+    res.cookie("token", token, { expires: new Date(user.exp * 1000) }).send();
+})
 
 router.get("/checkout", auth(), async (req, res) => {
     const host = `http://${req.get("Host")}`;
@@ -116,6 +125,26 @@ router.get("/checkout", auth(), async (req, res) => {
         });
     
         res.send(session);
+    }
+    catch (error)
+    {
+        console.log(error);
+        res.status(500).send("An error occurred while processing your request");
+    }
+})
+
+router.get("/manage", auth(), async (req, res) => {
+    const host = `http://${req.get("Host")}`;
+    const user = res.locals.user;
+
+    try
+    {
+        const session = await stripe.billingPortal.sessions.create({
+            customer: user.stripeCustomerId,
+            return_url: host,
+        });
+    
+        res.redirect(session.url);
     }
     catch (error)
     {

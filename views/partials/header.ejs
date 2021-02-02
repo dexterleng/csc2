@@ -13,9 +13,38 @@
 </head>
 <body>
 
-<nav class="navbar navbar-light bg-light">
-  <div class="container">
-    <span class="navbar-brand mb-0 h1">The Life Time Talents</span>
+<!-- <nav class="navbar navbar-expand-lg navbar-light bg-light flex-column flex-md-row bd-navbar">
+  <span class="navbar-brand mb-0 h1">The Life Time Talents</span>
+
+  <div class="navbar-nav flex-row ml-md-auto d-none d-md-flex">
+    <button class="btn btn-outline-success d-none d-lg-inline-block mb-3 mb-md-0 ml-md-3" type="submit">Search</button>
+  </div>
+</nav> -->
+
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+  <div class="container-fluid">
+    <a class="navbar-brand mb-1 h1" href="/">The Life Time Talents</a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+        <li class="nav-item">
+          <a class="nav-link active" aria-current="page" href="/">Home</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#">Link</a>
+        </li>
+      </ul>
+      <div class="d-flex">
+        <% if (!user) { %>
+          <a class="btn btn-outline-success" href="/login">Login</a>
+        <% } else { %>
+          <a class="btn btn-outline-primary" aria-current="page" href="/account">My Account</a>
+          <a id="logout" class="btn btn-outline-secondary" style="margin-left: 8px;" aria-current="page" href="#">Sign out</a>
+        <% } %>
+      </div>
+    </div>
   </div>
 </nav>
 

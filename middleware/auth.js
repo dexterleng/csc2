@@ -9,7 +9,7 @@ function auth({ deferHandle = false } = {})
     
     router.use(cookieParser());
     
-    router.use((req, res, next) => {
+    router.use(async (req, res, next) => {
         const authToken = req.cookies.token;
     
         try
@@ -18,7 +18,7 @@ function auth({ deferHandle = false } = {})
         }
         catch (error)
         {
-            if (deferHandle)
+            if (!deferHandle)
                 return res.status(403).send();
         }
         next();
