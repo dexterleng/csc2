@@ -9,6 +9,7 @@
     </form>
 <% } %>
 
+<div id="login-history" style="white-space: pre"/>
 
 <script>
     const stripe = Stripe("<%=STRIPE_PUBLIC%>");
@@ -20,7 +21,7 @@
             type: "get"
         });
     }
-    
+
     $("#checkout").click(e => {
         (async () => {
             try
@@ -34,6 +35,15 @@
             }
         })();
     });
+
+    (async () => {
+        const history = await $.ajax({
+            url: "/api/users/history",
+            type: "get"
+        });
+
+        $("#login-history").text(JSON.stringify(history, null, 2));
+    })();
 
 </script>
 

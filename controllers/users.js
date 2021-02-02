@@ -80,7 +80,7 @@ router.post("/login", useragent.express(), async (req ,res) => {
                 username,
                 timestamp: new Date(Date.now()).toISOString(),
                 ip: req.headers["x-forwarded-for"] || req.connection.remoteAddress,
-                agent: JSON.stringify(req.useragent)
+                agent: JSON.stringify(req.useragent.source)
             }
         });
 
@@ -160,6 +160,27 @@ router.get("/manage", auth(), async (req, res) => {
         console.log(error);
         res.status(500).send("An error occurred while processing your request");
     }
+});
+
+router.get("/history", auth(), async (req, res) => {
+    const user = res.locals.user;
+
+    try
+    {
+        const loginHistory = (await dynamodb.queryTableData({
+            TableName: "userSessions",
+            KeyConditionExpression: "username = :username",
+            ExpressionAttributeValues: { ":username": user.username }
+        })).Items
+
+        res.send(loginHistory);
+    }
+    catch (error)
+    {
+        console.log(error);
+        res.status(500).send("An error occurred while processing your request");
+    }
+
 });
 
 module.exports = router;
