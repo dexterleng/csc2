@@ -87,18 +87,11 @@ async function makeApiRequest(ajaxOptions, maxRetries = 5, timeoutMs = 1000) {
 }
 
 class TalentRepository {
-  async findAll() {
+  async findAll(data) {
     const talents = await makeApiRequest({
       type: 'GET',
-      url: 'api/talents/'
-    });
-    return talents;
-  }
-
-  async search(query) {
-    const talents = await makeApiRequest({
-      type: 'GET',
-      url: `/api/talents?query=${query}`
+      url: 'api/talents/',
+      data: data
     });
     return talents;
   }

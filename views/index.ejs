@@ -11,36 +11,77 @@
   </div>
 </form>
 
-<div id="talents-container" class="container">
-
+<div id="talent-pagination" class="container">
 </div>
 
 <script>
   const talentRepo = new TalentRepository();
+  let currentPage = 1;
+  loadCurrentPage();
 
-  Promise.resolve()
-      .then(() => setLoadingState())
-      .then(() => talentRepo.findAll())
-      .then(showTalents)
-      .catch(showError);
+  $(document).on('click', "#next-page", function(e) {
+    currentPage += 1;
+    loadCurrentPage();
+  })
+
+  $(document).on('click', "#prev-page", function(e) {
+    if (currentPage > 1) {
+      currentPage -= 1;
+    }
+    loadCurrentPage();
+  })
 
   $("#talent-search-form").submit(function (e) {
     e.preventDefault();
 
-    const query = $("#talent-search-query").val();
-    console.log(query);
-
-    Promise.resolve()
-      .then(() => setLoadingState())
-      .then(() => talentRepo.search(query))    
-      .then(showTalents)
-      .catch(showError);
-
+    currentPage = 1;
+    loadCurrentPage();
   });
 
+  async function loadCurrentPage() {
+    try {
+      const page = currentPage;
+      setLoadingState();
+      
+      const limit = 10;
+      const offset = (page - 1) * limit;
+      const query = $("#talent-search-query").val();
+      const isSearch = query !== undefined && query !== null && query.length > 0;
+      
+      let talents;
+
+      if (isSearch) {
+        talents = await talentRepo.findAll({ query, limit, offset })
+      } else {
+        talents = await talentRepo.findAll({ limit, offset })
+      }
+
+      const talentGrid = renderTalentGrid(talents);
+      const pageNavigationView = renderPageNavigationView(page);
+      
+      $("#talent-pagination").empty();
+      $("#talent-pagination").append(talentGrid);
+      $("#talent-pagination").append(pageNavigationView);
+    } catch (e) {
+      showError(e);
+    }
+  }
+
+  function renderPageNavigationView(page) {
+    return `
+    <nav>
+      <ul class="pagination">
+        <li class="page-item"><a class="page-link" href="#" id="prev-page">Previous</a></li>
+        <li class="page-item"><a class="page-link" href="#">${page}</a></li>
+        <li class="page-item"><a class="page-link" href="#" id="next-page">Next</a></li>
+      </ul>
+    </nav>
+    `
+  }
+
   function setLoadingState() {
-    $("#talents-container").empty();
-    $("#talents-container").append(`
+    $("#talent-pagination").empty();
+    $("#talent-pagination").append(`
     <div class="spinner-border" role="status">
     </div>
     `);
@@ -94,20 +135,16 @@
     return rows;
   }
 
-  function showTalents(talents) {
-    $("#talents-container").empty();
-    $("#talents-container").append(renderTalentGrid(talents));
-  }
-
   function showError(e) {
+    console.log(e);
     let message = "Something went wrong."
 
     if (e.status) {
       message = `Network request failed with status ${e.status}`
     }
 
-    $("#talents-container").empty();
-    $("#talents-container").append(`
+    $("#talent-pagination").empty();
+    $("#talent-pagination").append(`
       <div class="alert alert-danger" role="alert">
         ${message}
       </div>
