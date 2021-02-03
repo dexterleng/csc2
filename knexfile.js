@@ -1,3 +1,5 @@
+require('dotenv').config();
+
 // Update with your config settings.
 
 const { DB_HOST, DB_USER, DB_PASSWORD, DB_NAME } = require("./env_constants");
