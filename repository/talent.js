@@ -94,7 +94,35 @@ class TalentRepository {
     return result;
   }
 
+  validatePagination({ limit, offset }) {
+    const validationErrors = [];
+    if (limit === undefined || limit === null || (typeof(limit) !== 'number') || (isNaN(limit)) || (limit < 0)) {
+      validationErrors.push({
+        field: 'limit',
+        description: 'field must be a non-negative integer'
+      });
+    }
+
+    if (offset === undefined || offset === null || (typeof(offset) !== 'number') || (isNaN(offset)) || (offset < 0)) {
+      validationErrors.push({
+        field: 'offset',
+        description: 'field must be a non-negative integer'
+      });
+    }
+
+    return validationErrors;
+  }
+
   async findAll({ limit, offset }) {
+    limit = parseInt(limit)
+    offset = parseInt(offset)
+
+    const validationErrors = this.validatePagination({ limit, offset });
+
+    if (validationErrors.length > 0) {
+      throw new ResourceValidationError(validationErrors);
+    }
+
     return await db('talent')
       .select()
       .orderBy('created_at', 'desc')
@@ -103,7 +131,11 @@ class TalentRepository {
   }
 
   async search({ query, limit, offset }) {
-    // TODO: pagination, if needed.
+    const validationErrors = this.validatePagination({ limit, offset });
+
+    if (validationErrors.length > 0) {
+      throw new ResourceValidationError(validationErrors);
+    }
 
     const { hits } = await talentAlgoliaIndex.search(query, {
       hitsPerPage: limit,

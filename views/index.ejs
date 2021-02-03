@@ -17,6 +17,8 @@
 <script>
   const talentRepo = new TalentRepository();
   let currentPage = 1;
+  const hitsPerPage = 10;
+
   loadCurrentPage();
 
   $(document).on('click', "#next-page", function(e) {
@@ -43,7 +45,7 @@
       const page = currentPage;
       setLoadingState();
       
-      const limit = 10;
+      const limit = hitsPerPage;
       const offset = (page - 1) * limit;
       const query = $("#talent-search-query").val();
       const isSearch = query !== undefined && query !== null && query.length > 0;
@@ -63,7 +65,7 @@
       $("#talent-pagination").append(talentGrid);
       $("#talent-pagination").append(pageNavigationView);
     } catch (e) {
-      showError(e);
+      showErrorAsAlerts(e);
     }
   }
 
@@ -133,22 +135,6 @@
       .join('\n');
     
     return rows;
-  }
-
-  function showError(e) {
-    console.log(e);
-    let message = "Something went wrong."
-
-    if (e.status) {
-      message = `Network request failed with status ${e.status}`
-    }
-
-    $("#talent-pagination").empty();
-    $("#talent-pagination").append(`
-      <div class="alert alert-danger" role="alert">
-        ${message}
-      </div>
-    `);
   }
 </script>
 

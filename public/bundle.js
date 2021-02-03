@@ -7,8 +7,8 @@ function showErrorAsAlerts(e) {
 
   // validation errors
   if (e.responseJSON && e.responseJSON.errors) {
-    for (let error of errors) {
-      messages.push(error);
+    for (let error of e.responseJSON.errors) {
+      messages.push(`[${error.field}]: ${error.description}`);
     }
   }
 
