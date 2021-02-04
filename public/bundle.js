@@ -7,8 +7,8 @@ function showErrorAsAlerts(e) {
 
   // validation errors
   if (e.responseJSON && e.responseJSON.errors) {
-    for (let error of errors) {
-      messages.push(error);
+    for (let error of e.responseJSON.errors) {
+      messages.push(`[${error.field}]: ${error.description}`);
     }
   }
 
@@ -87,18 +87,11 @@ async function makeApiRequest(ajaxOptions, maxRetries = 5, timeoutMs = 1000) {
 }
 
 class TalentRepository {
-  async findAll() {
+  async findAll(data) {
     const talents = await makeApiRequest({
       type: 'GET',
-      url: 'api/talents/'
-    });
-    return talents;
-  }
-
-  async search(query) {
-    const talents = await makeApiRequest({
-      type: 'GET',
-      url: `api/talents?query=${query}`
+      url: 'api/talents/',
+      data: data
     });
     return talents;
   }
@@ -106,7 +99,7 @@ class TalentRepository {
   async find(id) {
     const talent = await makeApiRequest({
       type: 'GET',
-      url: `api/talents/${id}`
+      url: `/api/talents/${id}`
     });
     return talent;
   }
@@ -114,7 +107,7 @@ class TalentRepository {
   async update(id, formData) {
     return await makeApiRequest({
       type: 'PUT',
-      url: `api/talents/${id}`,
+      url: `/api/talents/${id}`,
       data: formData,
       contentType: false,
       processData: false,
@@ -124,7 +117,7 @@ class TalentRepository {
   async insert(formData) {
     const res = await makeApiRequest({
       type: 'POST',
-      url: 'api/talents/',
+      url: '/api/talents/',
       data: formData,
       contentType: false,
       processData: false,
@@ -144,7 +137,7 @@ class User
     static checkout()
     {
         return $.ajax({
-            url: "api/users/checkout",
+            url: "/api/users/checkout",
             type: "get"
         });
     }
@@ -152,7 +145,7 @@ class User
     static getHistory()
     {
         return $.ajax({
-            url: "api/users/history",
+            url: "/api/users/history",
             type: "get"
         });
     }
@@ -160,7 +153,7 @@ class User
     static login(username, password)
     {
         return $.ajax({
-            url: "api/users/login",
+            url: "/api/users/login",
             type: "post",
             contentType: "application/json",
             data: JSON.stringify({ username, password })
@@ -170,7 +163,7 @@ class User
     static register(username, password)
     {
         return $.ajax({
-            url: "api/users/register",
+            url: "/api/users/register",
             type: "post",
             contentType: "application/json",
             data: JSON.stringify({ username, password })
@@ -180,7 +173,7 @@ class User
     static getSubscription()
     {
         return $.ajax({
-            url: "api/users/subscription",
+            url: "/api/users/subscription",
             type: "get"
         });
     }
