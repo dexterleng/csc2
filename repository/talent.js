@@ -131,6 +131,9 @@ class TalentRepository {
   }
 
   async search({ query, limit, offset }) {
+    limit = parseInt(limit)
+    offset = parseInt(offset)
+
     const validationErrors = this.validatePagination({ limit, offset });
 
     if (validationErrors.length > 0) {
