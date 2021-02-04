@@ -107,7 +107,7 @@ router.post("/login", useragent.express(), async (req ,res) => {
     
 });
 
-router.get("/subscription", auth(), async (req, res) => {
+router.get("/subscription", auth, async (req, res) => {
     res.clearCookie("token");
     
     const user = res.locals.user;
@@ -122,7 +122,7 @@ router.get("/subscription", auth(), async (req, res) => {
     res.cookie("token", token, { overwrite: true }).send();
 })
 
-router.get("/checkout", auth(), async (req, res) => {
+router.get("/checkout", auth, async (req, res) => {
     const host = (process.env.API_GATEWAY_URL && `${process.env.API_GATEWAY_URL}/home`) || `http://${req.get("Host")}`;
     const user = res.locals.user;
 
@@ -146,7 +146,7 @@ router.get("/checkout", auth(), async (req, res) => {
     }
 })
 
-router.get("/manage", auth(), async (req, res) => {
+router.get("/manage", auth, async (req, res) => {
     const host = (process.env.API_GATEWAY_URL && `${process.env.API_GATEWAY_URL}/home`) || `http://${req.get("Host")}`;
     const user = res.locals.user;
 
@@ -166,7 +166,7 @@ router.get("/manage", auth(), async (req, res) => {
     }
 });
 
-router.get("/history", auth(), async (req, res) => {
+router.get("/history", auth, async (req, res) => {
     const user = res.locals.user;
 
     try
