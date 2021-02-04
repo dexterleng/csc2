@@ -6,6 +6,7 @@ const { ResourceNotFound, ResourceValidationError } = require('./repository/erro
 const { isFacePresent } = require('./face_detection');
 const multerUpload = require('./multerImageUpload');
 const { uploadToS3, generateGetPresignedUrl } = require('./s3');
+const auth = require('./middleware/auth');
 
 /**
  * @swagger
@@ -32,7 +33,7 @@ const uploadProfilePictureMiddleware = multerUpload.single('profile_picture')
 
 router.use("/users", require("./controllers/users"));
 
-router.post('/talents/', uploadProfilePictureMiddleware, async (req, res, next) => {
+router.post('/talents/', auth(), uploadProfilePictureMiddleware, async (req, res, next) => {
   try {
     if (!req.file) {
       res.status(400).send({
@@ -63,8 +64,7 @@ router.post('/talents/', uploadProfilePictureMiddleware, async (req, res, next) 
   }
 });
 
-
-router.put('/talents/:id', uploadProfilePictureMiddleware, async (req, res, next) => {
+router.put('/talents/:id', auth(), uploadProfilePictureMiddleware, async (req, res, next) => {
   try {
     if (!req.file) {
       res.status(400).send({
@@ -137,7 +137,7 @@ router.get('/talents/:id', async (req, res, next) => {
   }
 })
 
-router.delete('/talents/:id', async (req, res, next) => {
+router.delete('/talents/:id', auth(), async (req, res, next) => {
   try {
     const { id } = req.params;
     await TalentRepository.delete(id);

@@ -19,6 +19,10 @@ function showErrorAsAlerts(e) {
       message = `Network request failed with status ${e.status}`
     }
 
+    if (!e.status && e.message) {
+      message = e.message;
+    }
+
     messages.push(message);
   }
 
