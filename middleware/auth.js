@@ -1,31 +1,23 @@
-const express = require("express");
-const jwt = require("jsonwebtoken");
-const cookieParser = require("cookie-parser");
-const { JWT_SECRET } = require("../env_constants");
+module.exports = (premiumOnly = false) => (req, res, next) => {
+    if (!res.locals.user) {
+        return res.status(401).send({
+            'message': 'You are not authorized to access this resource.'
+        });
+    }
 
-function auth({ deferHandle = false } = {})
-{
-    const router = express.Router();
-    
-    router.use(cookieParser());
-    
-    router.use(async (req, res, next) => {
-        const authToken = req.cookies.token;
-    
-        try
-        {
-            res.locals.user = jwt.verify(authToken, JWT_SECRET);
+    if (premiumOnly) {
+        if (!res.locals.user.type) {
+            return res.status(401).send({
+                'message': 'You are not authorized to access this resource.'
+            });
         }
-        catch (error)
-        {
-            res.clearCookie("token");
-            if (!deferHandle)
-                return res.status(403).send();
-        }
-        next();
-    });
 
-    return router;
+        if (res.locals.user.type !== 'premium') {
+            return res.status(401).send({
+                'message': 'You are not authorized to access this resource.'
+            });
+        }
+    }
+
+    next();
 }
-
-module.exports = auth;

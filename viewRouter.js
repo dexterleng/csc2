@@ -1,6 +1,5 @@
 const express = require('express');
 const { DISQUS_SHORTNAME, STRIPE_PUBLIC } = require('./env_constants');
-const auth = require("./middleware/auth");
 const router = express.Router()
 
 const authHandler = shouldFindSession => (req, res, next) => {
@@ -14,7 +13,7 @@ const injectGlobal = (req, res, next) => {
   next();
 };
 
-router.use(auth({ deferHandle: true }), injectGlobal);
+router.use(injectGlobal);
 
 router.get("/login", authHandler(false), (req, res) => res.render("login"));
 
