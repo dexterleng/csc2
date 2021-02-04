@@ -85,12 +85,17 @@ class TalentRepository {
   }
 
   async find(id) {
-    const result = await db('talent').select().where({ id }).limit(1).first();
+    const result = await this._find(id);
 
     if (!result) {
       throw new ResourceNotFound();
     }
 
+    return result;
+  }
+
+  async _find(id) {
+    const result = await db('talent').select().where({ id }).limit(1).first();
     return result;
   }
 
@@ -169,7 +174,7 @@ class TalentRepository {
   async delete(id) {
     // TODO: Consider deleting the image from disk/s3
 
-    const talent = await this.find(id);
+    const talent = await this._find(id);
     await db('talent').where('id', talent.id).delete();
 
     await talentAlgoliaIndex.deleteObject(talent.id)
