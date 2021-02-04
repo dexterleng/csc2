@@ -7,8 +7,8 @@ function showErrorAsAlerts(e) {
 
   // validation errors
   if (e.responseJSON && e.responseJSON.errors) {
-    for (let error of errors) {
-      messages.push(error);
+    for (let error of e.responseJSON.errors) {
+      messages.push(`[${error.field}]: ${error.description}`);
     }
   }
 
@@ -87,18 +87,11 @@ async function makeApiRequest(ajaxOptions, maxRetries = 5, timeoutMs = 1000) {
 }
 
 class TalentRepository {
-  async findAll() {
+  async findAll(data) {
     const talents = await makeApiRequest({
       type: 'GET',
-      url: `${baseUrl}/api/talents/`
-    });
-    return talents;
-  }
-
-  async search(query) {
-    const talents = await makeApiRequest({
-      type: 'GET',
-      url: `${baseUrl}/api/talents?query=${query}`
+      url: `${baseUrl}/api/talents/`,
+      data: data
     });
     return talents;
   }
@@ -124,7 +117,7 @@ class TalentRepository {
   async insert(formData) {
     const res = await makeApiRequest({
       type: 'POST',
-      url: `${baseUrl}api/talents/`,
+      url: `${baseUrl}/api/talents/`,
       data: formData,
       contentType: false,
       processData: false,
