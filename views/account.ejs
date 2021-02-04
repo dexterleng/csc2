@@ -15,15 +15,32 @@
             <% } %>
         </div>
     </div>
+
+    <div class="card" style="margin-top: 16px;">
+        <div class="card-body">
+            <h5 class="card-title">Past Sessions</h5>
+            <ul id="login-history" class="list-group list-group-flush"></ul>
+        </div>
+    </div>
+
 </div>
 
 
-<div id="login-history" style="white-space: pre"/>
+
+<div  style="white-space: pre"/>
 
 <script>
     const stripe = Stripe("<%=locals.env.STRIPE_PUBLIC%>");
-    const isPremium = <%=(locals.user.type === "premium")%>
+    const isPremium = <%=(locals.user.type === "premium")%>;
     
+    const deviceHistoryTemplate = item => (`
+        <li class="list-group-item">
+            ${item.timestamp}<br>
+            <strong>IP: </strong>${item.ip}<br>
+            <strong>Device: </strong>${item.agent}<br>
+        </li>
+    `);
+
     $("#checkout").click(e => {
         (async () => {
             try
@@ -40,12 +57,18 @@
 
     (async () => {
         const history = await User.getHistory();
-        $("#login-history").text(JSON.stringify(history, null, 2));
+        const $loginHistory = $("#login-history");
 
+        $loginHistory.empty();
+
+        history.forEach(a => {
+            $loginHistory.append(deviceHistoryTemplate(a));
+        });
+        
         if (!isPremium)
         {
             const pricing = await User.getSubscriptionPricing();
-            $("#subscription-status").text(`Your subscription is currently inactive. Join now for only ${pricing}`);
+            $("#subscription-status").html(`Your subscription is currently inactive.<br>Join now for only <b>${pricing}</b>`);
         }
 
     })();
