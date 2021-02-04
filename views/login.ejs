@@ -31,7 +31,7 @@
                 if (isLogin)
                 {
                     await User.login(username, password);
-                    window.location.replace("home");
+                    window.location.replace(`${baseUrl}/home`);
                 }
                 else
                 {

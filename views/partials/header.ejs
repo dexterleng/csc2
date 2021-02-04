@@ -4,7 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Document</title>
-  <base href="<%=locals.env.API_GATEWAY_URL%>">
   <script src="https://js.stripe.com/v3/"></script>
   <script src="public/bundle.js"></script>
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
@@ -15,7 +14,7 @@
 <body>
 
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
-  <a class="navbar-brand" href="home">The Life Time Talents</a>
+  <a class="navbar-brand" href="<%=locals.env.BASE_URL%>/home">The Life Time Talents</a>
   <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
     <span class="navbar-toggler-icon"></span>
   </button>
@@ -23,7 +22,7 @@
   <div class="collapse navbar-collapse" id="navbarSupportedContent">
     <ul class="navbar-nav mr-auto">
       <li class="nav-item active">
-        <a class="nav-link" href="home">Home</a>
+        <a class="nav-link" href="<%=locals.env.BASE_URL%>/home">Home</a>
       </li>
       <li class="nav-item">
         <a class="nav-link" href="#">Link</a>
@@ -31,9 +30,9 @@
     </ul>
     <div class="form-inline my-2 my-lg-0">
       <% if (!locals.user) { %>
-        <a class="btn btn-outline-success" href="login">Login</a>
+        <a class="btn btn-outline-success" href="<%=locals.env.BASE_URL%>/login">Login</a>
       <% } else { %>
-        <a class="btn btn-outline-primary" aria-current="page" href="account">My Account</a>
+        <a class="btn btn-outline-primary" aria-current="page" href="<%=locals.env.BASE_URL%>/account">My Account</a>
         <button id="logout" class="btn btn-outline-secondary" style="margin-left: 8px;">Sign out</button>
       <% } %>
     </div>

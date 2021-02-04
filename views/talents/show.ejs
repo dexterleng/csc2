@@ -57,7 +57,7 @@
       <h5 class="card-title">${talent.name}</h5>
       <p class="card-text">${talent.description}</p>
       
-      <a href="/talents/${talent.id}/edit" class="btn btn-primary">Edit Profile</a>
+      <a href="${baseUrl}/talents/${talent.id}/edit" class="btn btn-primary">Edit Profile</a>
       <button id="delete-talent-button" class="btn btn-danger">Delete Profile</a>
     </div>
   </div>
@@ -71,7 +71,7 @@
   }
 
   function redirectToHomePage() {
-    window.location.replace('/');
+    window.location.replace(`${baseUrl}/home`);
   }
 
 </script>
