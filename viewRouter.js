@@ -40,7 +40,7 @@ router.get('/talents/:id', function (req, res, next) {
     talentId: req.params.id,
     disqusShortname: DISQUS_SHORTNAME,
     disqusUrl,
-    user: res.locals.user
+    user: res.locals.user,
   });
 })
 
