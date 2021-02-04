@@ -20,7 +20,7 @@ router.get("/login", authHandler(false), (req, res) => res.render("login"));
 
 router.get("/account", authHandler(true), (req, res) => res.render("account"));
 
-router.get('/', function (req, res, next) {
+router.get('/home', function (req, res, next) {
   res.render('index', { user: res.locals.user });
 })
 
