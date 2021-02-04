@@ -15,10 +15,7 @@ const options = {
     apis: ["./*.js"]
 }
 
-if (process.env.NODE_ENV !== "production")
-{
-    process.env.API_GATEWAY_URL = "";
-}
+process.env.BASE_URL = process.env.NODE_ENV === "production" ? process.env.API_GATEWAY_URL : `http://localhost:${process.env.PORT}`;
 
 const swaggerSpec = swaggerJSDoc(options);
 
