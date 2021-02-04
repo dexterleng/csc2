@@ -1,9 +1,7 @@
 </div>
 </body>
 <script>
-
-    const baseUrl = "<%=locals.env.BASE_URL%>";
-
+    
     $("#logout").click(e => {
         document.cookie = "token=; Max-Age=0; path=/;";
         window.location.replace(`${baseUrl}/home`);

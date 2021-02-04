@@ -177,4 +177,12 @@ class User
             type: "get"
         });
     }
+
+    static getSubscriptionPricing()
+    {
+        return $.ajax({
+            url: `${baseUrl}/api/users/subscription/price`,
+            type: "get"
+        });
+    }
 }

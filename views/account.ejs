@@ -1,16 +1,28 @@
 <%- include('partials/header') %>
 
-<span><%=locals.user.type%> user</span><br>
-<% if (locals.user.type !== "premium") { %>
-    <button id="checkout" class="btn btn-primary btn-block">Checkout</button>
-<% } else { %>
-    <a id="manage" class="btn btn-primary btn-block" href="<%=locals.env.BASE_URL%>/api/users/manage">Manage billing</a>
-<% } %>
+<div class="container">
+    <h2>Account</h2>
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title">Billing</h5>
+            <h6 class="card-subtitle mb-2 text-muted"><%=locals.user.type%> user</h6>
+            
+            <p id="subscription-status" class="card-text">Your subscription is currently active. </p>
+            <% if (locals.user.type !== "premium") { %>
+                <button id="checkout" class="btn btn-primary">Checkout</button>
+            <% } else { %>
+                <a id="manage" class="btn btn-primary" href="<%=locals.env.BASE_URL%>/api/users/manage">Manage billing</a>
+            <% } %>
+        </div>
+    </div>
+</div>
+
 
 <div id="login-history" style="white-space: pre"/>
 
 <script>
     const stripe = Stripe("<%=locals.env.STRIPE_PUBLIC%>");
+    const isPremium = <%=(locals.user.type === "premium")%>
     
     $("#checkout").click(e => {
         (async () => {
@@ -28,8 +40,14 @@
 
     (async () => {
         const history = await User.getHistory();
-
         $("#login-history").text(JSON.stringify(history, null, 2));
+
+        if (!isPremium)
+        {
+            const pricing = await User.getSubscriptionPricing();
+            $("#subscription-status").text(`Your subscription is currently inactive. Join now for only ${pricing}`);
+        }
+
     })();
 
 </script>

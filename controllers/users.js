@@ -107,7 +107,7 @@ router.post("/login", useragent.express(), async (req ,res) => {
     
 });
 
-router.get("/subscription", auth, async (req, res) => {
+router.get("/subscription", auth(), async (req, res) => {
     res.clearCookie("token");
     
     const user = res.locals.user;
@@ -122,7 +122,16 @@ router.get("/subscription", auth, async (req, res) => {
     res.cookie("token", token, { overwrite: true }).send();
 })
 
-router.get("/checkout", auth, async (req, res) => {
+router.get("/subscription/price", async (req, res) => {
+    const price = await stripe.prices.retrieve(STRIPE_PRODUCT_ID);
+
+    const priceStr = price.unit_amount_decimal;
+    const formattedPrice = `${priceStr.slice(0, -2)}.${priceStr.slice(-2)}`
+
+    res.send(`${formattedPrice} ${price.currency.toUpperCase()}/${price.recurring.interval}`);
+});
+
+router.get("/checkout", auth(), async (req, res) => {
     const host = `${process.env.BASE_URL}/home`;
     const user = res.locals.user;
 
@@ -146,7 +155,7 @@ router.get("/checkout", auth, async (req, res) => {
     }
 })
 
-router.get("/manage", auth, async (req, res) => {
+router.get("/manage", auth(), async (req, res) => {
     const host = `${process.env.BASE_URL}/home`;
     const user = res.locals.user;
 
@@ -166,7 +175,7 @@ router.get("/manage", auth, async (req, res) => {
     }
 });
 
-router.get("/history", auth, async (req, res) => {
+router.get("/history", auth(), async (req, res) => {
     const user = res.locals.user;
 
     try
