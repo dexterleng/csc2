@@ -16,9 +16,9 @@ const injectGlobal = (req, res, next) => {
 
 router.use(auth({ deferHandle: true }), injectGlobal);
 
-router.post("/login", authHandler(false), (req, res) => res.render("login"));
+router.get("/login", authHandler(false), (req, res) => res.render("login"));
 
-router.post("/account", authHandler(true), (req, res) => res.render("account"));
+router.get("/account", authHandler(true), (req, res) => res.render("account"));
 
 router.get('/', function (req, res, next) {
   res.render('index', { user: res.locals.user });
