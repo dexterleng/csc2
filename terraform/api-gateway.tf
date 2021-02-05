@@ -11,6 +11,8 @@ resource "aws_api_gateway_rest_api" "apigateway" {
     endpoint_configuration {
         types = ["REGIONAL"]
     }
+
+    binary_media_types = [ "multipart/form-data" ]
 }
 
 resource "aws_api_gateway_resource" "default" {
@@ -54,8 +56,94 @@ resource "aws_api_gateway_integration" "default" {
 
 resource "aws_api_gateway_deployment" "default" {
     depends_on = [
-        "aws_api_gateway_integration.default"
+        aws_api_gateway_integration.default
     ]
-    rest_api_id = "${aws_api_gateway_rest_api.apigateway.id}"
+    rest_api_id = aws_api_gateway_rest_api.apigateway.id
+}
+
+resource "aws_api_gateway_stage" "default" {
+    deployment_id = aws_api_gateway_deployment.default.id
+    rest_api_id = aws_api_gateway_rest_api.apigateway.id
     stage_name  = "deployment"
+
+    access_log_settings {
+        destination_arn = aws_cloudwatch_log_group.accessLogs.arn
+        format = "$context.identity.sourceIp $context.identity.caller $context.identity.user [$context.requestTime] \"$context.httpMethod $context.resourcePath $context.protocol\" $context.status $context.responseLength $context.requestId"
+    }
+}
+
+/*
+    cloudwatch logging
+*/
+resource "aws_api_gateway_account" "name" {
+    cloudwatch_role_arn = aws_iam_role.cloudwatch.arn
+}
+
+# specifically for access logging
+resource "aws_cloudwatch_log_group" "accessLogs" {
+    name = "accessLogs"
+}
+
+resource "aws_iam_role" "cloudwatch" {
+    name = "api_gateway_cloudwatch_global"
+
+    assume_role_policy = <<EOF
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "",
+            "Effect": "Allow",
+            "Principal": {
+                "Service": "apigateway.amazonaws.com"
+            },
+            "Action": "sts:AssumeRole"
+        }
+    ]
+}
+EOF
+}
+
+resource "aws_iam_role_policy" "cloudwatch" {
+    role = aws_iam_role.cloudwatch.id
+
+    policy = <<EOF
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": [
+                "logs:CreateLogGroup",
+                "logs:CreateLogStream",
+                "logs:DescribeLogGroups",
+                "logs:DescribeLogStreams",
+                "logs:PutLogEvents",
+                "logs:GetLogEvents",
+                "logs:FilterLogEvents"
+            ],
+            "Resource": "*"
+        }
+    ]
+}
+EOF
+}
+resource "aws_iam_policy_attachment" "api_gateway_logs" {
+    name = "api_gateway_logs_policy_attach"
+    roles = [aws_iam_role.cloudwatch.id]
+    policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonAPIGatewayPushToCloudWatchLogs"
+}  
+
+resource "aws_api_gateway_method_settings" "default" {
+    depends_on = [ aws_iam_policy_attachment.api_gateway_logs ]
+
+    rest_api_id = aws_api_gateway_rest_api.apigateway.id
+    stage_name  = aws_api_gateway_stage.default.stage_name
+    method_path = "*/*"
+
+    settings {
+        metrics_enabled = true
+        logging_level = "INFO"
+        data_trace_enabled = true
+    }
 }
