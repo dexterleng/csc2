@@ -4,7 +4,7 @@ const router = express.Router()
 
 const authHandler = shouldFindSession => (req, res, next) => {
   if (!res.locals.user === shouldFindSession)
-    return res.redirect("home");
+    return res.redirect("/login?error=You must be signed in to access this resource.");
   next();
 };
 
@@ -19,11 +19,11 @@ router.get("/login", authHandler(false), (req, res) => res.render("login"));
 
 router.get("/account", authHandler(true), (req, res) => res.render("account"));
 
-router.get('/home', function (req, res, next) {
+router.get('/', function (req, res, next) {
   res.render('index', { user: res.locals.user });
 })
 
-router.get('/talents/create', function(req, res, next) {
+router.get('/talents/create', authHandler(true), function(req, res, next) {
   res.render('talents/create');
 })
 
@@ -40,7 +40,7 @@ router.get('/talents/:id', function (req, res, next) {
     talentId: req.params.id,
     disqusShortname: DISQUS_SHORTNAME,
     disqusUrl,
-    user: res.locals.user
+    user: res.locals.user,
   });
 })
 

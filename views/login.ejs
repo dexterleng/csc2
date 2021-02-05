@@ -17,6 +17,14 @@
 </div>
 
 <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const errorParam = urlParams.get('error');
+    if (errorParam && errorParam.length > 0) {
+        console.log(errorParam);
+        showErrorAsAlerts(new Error(errorParam));
+    }
+
+
     const $username = $("#username");
     const $password = $("#password");
 
@@ -31,7 +39,7 @@
                 if (isLogin)
                 {
                     await User.login(username, password);
-                    window.location.replace(`${baseUrl}/home`);
+                    window.location.replace(`${baseUrl}`);
                 }
                 else
                 {

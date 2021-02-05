@@ -11,9 +11,28 @@
 
 </div>
 
+<% if (user && user.type === "premium") { %>
+
 <div id="disqus_thread" style="margin-top: 1rem;"></div>
 
+<% } else { %>
+
+<div class="card" style="margin-top: 1rem;">
+  <div class="card-body">
+    <h5 class="card-title">Want to participate in discussions about this talent?</h5>
+    <p class="card-text">Join the Premium Plan to get started!</p>
+    <button id="join-premium-button" class="btn btn-primary" redirect-to="/account/" <%= user ? "" : "disabled"  %>>Join Premium</a>
+  </div>
+  <div class="card-footer text-muted">
+    Please sign-in to join the Premium Plan.
+  </div>
+</div>
+
+<% } %>
+
 <script>
+  const isUserLoggedIn = "<%= !!locals.user %>" === "true";
+
   const talentId = "<%= talentId %>";
   const talentRepo = new TalentRepository();
 
@@ -56,11 +75,20 @@
     <div class="card-body">
       <h5 class="card-title">${talent.name}</h5>
       <p class="card-text">${talent.description}</p>
-      
-      <a href="${baseUrl}/talents/${talent.id}/edit" class="btn btn-primary">Edit Profile</a>
-      <button id="delete-talent-button" class="btn btn-danger">Delete Profile</a>
+
+      <div class="btn-group">
+        <button id="edit-talent-button" class="btn btn-primary" redirect-to="${baseUrl}/talents/${talent.id}/edit" ${ isUserLoggedIn ? "" : "disabled" }>Edit Profile</button>
+        <button id="delete-talent-button" class="btn btn-danger" ${ isUserLoggedIn ? "" : "disabled" }>Delete Profile</button>
+      </div>
     </div>
   </div>
+  ${
+    isUserLoggedIn ? "" : `
+    <div class="card-footer text-muted">
+      Please sign-in to edit or delete talents.
+    </div>
+    `
+  }
 </div>
     `;
   }
@@ -71,10 +99,24 @@
   }
 
   function redirectToHomePage() {
-    window.location.replace(`${baseUrl}/home`);
+    window.location.replace(`${baseUrl}`);
   }
 
+  $(document).on('click', '#edit-talent-button', function(e) {
+    const url = e.target.getAttribute('redirect-to');
+    window.location.replace(url);
+  })
+
+  $(document).on('click', '#join-premium-button', function(e) {
+    const url = e.target.getAttribute('redirect-to');
+    window.location.replace(url);
+  })
+
+
+
 </script>
+
+<% if (user && user.type === "premium") { %>
 
 <script>
   /**
@@ -94,5 +136,7 @@
 </script>
 
 <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+
+<% } %>
 
 <%- include('../partials/footer') %>
