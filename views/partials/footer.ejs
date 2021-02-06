@@ -4,7 +4,7 @@
     
     $("#logout").click(e => {
         document.cookie = "token=; Max-Age=0; path=/;";
-        window.location.replace(`${baseUrl}`);
+        window.location.replace(`${baseUrl}/home`);
     });
     
     function getCookie(cname) {

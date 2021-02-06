@@ -142,7 +142,7 @@ router.get("/subscription/price", async (req, res) => {
 });
 
 router.get("/checkout", auth(), async (req, res) => {
-    const host = `${process.env.BASE_URL}`;
+    const host = `${process.env.BASE_URL}/home`;
     const user = res.locals.user;
 
     try
@@ -166,7 +166,7 @@ router.get("/checkout", auth(), async (req, res) => {
 })
 
 router.get("/manage", auth(), async (req, res) => {
-    const host = `${process.env.BASE_URL}`;
+    const host = `${process.env.BASE_URL}/home`;
     const user = res.locals.user;
 
     try
