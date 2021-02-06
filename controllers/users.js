@@ -51,7 +51,7 @@ router.post("/register", async (req, res) => {
             }
         });
 
-        res.status(204).send();
+        res.status(204).send("");
     }
     catch (error)
     {
@@ -107,7 +107,7 @@ router.post("/login", useragent.express(), async (req ,res) => {
         // bugged when running on server
         // const dt = new Date();
         // dt.setSeconds(dt.getSeconds() + config.jwt.expiresIn);
-        res.cookie("token", token, { overwrite: true }).send();
+        res.cookie("token", token, { overwrite: true }).send("");
     }
     catch (error)
     {
@@ -129,7 +129,7 @@ router.get("/subscription", auth(), async (req, res) => {
         type: currentPlan
     }, JWT_SECRET, { mutatePayload: true });
 
-    res.cookie("token", token, { overwrite: true }).send();
+    res.cookie("token", token, { overwrite: true }).send("");
 })
 
 router.get("/subscription/price", async (req, res) => {

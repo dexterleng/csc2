@@ -58,7 +58,7 @@ router.post('/talents/', auth(), uploadProfilePictureMiddleware, async (req, res
 
     await TalentRepository.insert({ name, description, profile_picture_path: profile_picture_key });
 
-    res.status(201).send();
+    res.status(201).send("");
   } catch (e) {
     next(e);
   }
