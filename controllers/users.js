@@ -29,7 +29,7 @@ router.post("/register", async (req, res) => {
         })).Item;
 
         if (user)
-            res.status(403).send("User already exists");
+            return res.status(403).send("User already exists");
 
         // salt is held within hash format
         let passwordHash;
