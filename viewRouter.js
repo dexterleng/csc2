@@ -4,7 +4,7 @@ const router = express.Router()
 
 const authHandler = shouldFindSession => (req, res, next) => {
   if (!res.locals.user === shouldFindSession)
-    return res.redirect("/login?error=You must be signed in to access this resource.");
+    return res.redirect(`${process.env.BASE_URL}/login?error=You must be signed in to access this resource.`);
   next();
 };
 
