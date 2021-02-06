@@ -15,6 +15,7 @@ resource "aws_api_gateway_rest_api" "apigateway" {
     binary_media_types = [ "multipart/form-data" ]
 }
 
+# proxying
 resource "aws_api_gateway_resource" "default" {
     rest_api_id = aws_api_gateway_rest_api.apigateway.id
     parent_id = aws_api_gateway_rest_api.apigateway.root_resource_id
@@ -54,9 +55,67 @@ resource "aws_api_gateway_integration" "default" {
 
 }
 
+# lambda
+resource "aws_api_gateway_resource" "lambda" {
+    rest_api_id = aws_api_gateway_rest_api.apigateway.id
+    parent_id = aws_api_gateway_rest_api.apigateway.root_resource_id
+    path_part = "lambda"
+}
+
+resource "aws_api_gateway_resource" "lambdaHash" {
+    rest_api_id = aws_api_gateway_rest_api.apigateway.id
+    parent_id = aws_api_gateway_resource.lambda.id
+    path_part = "hash"
+}
+
+resource "aws_api_gateway_method" "lambdaHash" {
+    rest_api_id = aws_api_gateway_rest_api.apigateway.id
+    resource_id = aws_api_gateway_resource.lambdaHash.id
+
+    http_method = "POST"
+    authorization = "NONE"
+
+    # request_parameters = {
+    #     "method.request.path.proxy" = true
+    # }
+}
+
+resource "aws_api_gateway_integration" "lambdaHash" {
+    rest_api_id = aws_api_gateway_rest_api.apigateway.id
+    resource_id = aws_api_gateway_resource.lambdaHash.id
+    http_method = aws_api_gateway_method.lambdaHash.http_method
+
+    type = "AWS"
+    integration_http_method = "POST"
+    uri = aws_lambda_function.hashFunction.invoke_arn
+
+}
+
+# have to recreate method manually even though it is the exact same display on the dashboard
+resource "aws_api_gateway_method_response" "lambdaHashSuccess" {
+    rest_api_id = aws_api_gateway_rest_api.apigateway.id
+    resource_id = aws_api_gateway_resource.lambdaHash.id
+    http_method = aws_api_gateway_method.lambdaHash.http_method
+    status_code = "200"
+
+    response_models = {
+        "application/json" = "Empty"
+    }
+}
+
+# resource "aws_api_gateway_integration_response" "lambdaHash" {
+#     rest_api_id = aws_api_gateway_rest_api.apigateway.id
+#     resource_id = aws_api_gateway_resource.lambdaHash.id
+#     http_method = aws_api_gateway_method.lambdaHash.http_method
+#     status_code = aws_api_gateway_method_response.lambdaHashSuccess.status_code
+
+    
+# }
+
 resource "aws_api_gateway_deployment" "default" {
     depends_on = [
-        aws_api_gateway_integration.default
+        aws_api_gateway_integration.default,
+        aws_api_gateway_integration.lambdaHash
     ]
     rest_api_id = aws_api_gateway_rest_api.apigateway.id
 }

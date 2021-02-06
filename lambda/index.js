@@ -1,5 +1,4 @@
 const bcrypt = require("bcrypt");
-const config = require("config");
 
 // hash when only password provided
 // return match if userHash (actual hash to check against) is provided

@@ -4,6 +4,11 @@ variable "aws_session_token" {}
 # variable "aws_key_path" {}
 # variable "aws_key_name" {}
 
+variable "hash_function_lambda" {
+    description = "zip of lambda function contents"
+    default = "../lambda/lambda.zip"
+}
+
 variable "aws_region" {
     description = "EC2 Region for the VPC"
     default = "us-east-1"
