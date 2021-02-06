@@ -6,11 +6,10 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "algoliasearch": "^4.8.4",
-    "knex": "^0.21.17",
-    "mysql2": "^2.2.5"
+    "bcrypt": "^5.0.0"
   }
 }

@@ -5,6 +5,7 @@ const jwt = require("jsonwebtoken");
 const dynamodb = require("../lib/dynamodb");
 const { stripe, getSubscription } = require("../lib/stripe");
 const useragent = require('express-useragent');
+const lambda = require("../lib/lambda");
 
 const config = require("../config");
 const { JWT_SECRET, STRIPE_PRODUCT_ID } = require("../env_constants");
@@ -31,8 +32,12 @@ router.post("/register", async (req, res) => {
             res.status(403).send("User already exists");
 
         // salt is held within hash format
-        const passwordHash = await bcrypt.hash(password, config.bcrypt.saltRounds);
-        
+        let passwordHash;
+        if (process.env.NODE_ENV !== "production")
+            passwordHash = await bcrypt.hash(password, config.bcrypt.saltRounds);
+        else
+            passwordHash = await lambda.hash.hash(password, config.bcrypt.saltRounds);
+
         const stripeCustomer = await stripe.customers.create({
             metadata: { username }
         });
@@ -69,7 +74,12 @@ router.post("/login", useragent.express(), async (req ,res) => {
         if (!user)
             return res.status(403).send("Invalid username or password");
             
-        const passwordMatches = await bcrypt.compare(password, user.passwordHash);
+        let passwordMatches;
+        if (process.env.NODE_ENV !== "production")
+            passwordMatches = await bcrypt.compare(password, user.passwordHash);
+        else
+            passwordMatches = await lambda.hash.compareHash(password, user.passwordHash);
+
         if (!passwordMatches)
             return res.status(403).send("Invalid username or password");
 

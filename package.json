@@ -13,6 +13,7 @@
   "dependencies": {
     "algoliasearch": "^4.8.4",
     "aws-sdk": "^2.830.0",
+    "axios": "^0.21.1",
     "bcrypt": "^5.0.0",
     "clarifai-nodejs-grpc": "^7.0.3",
     "cookie-parser": "^1.4.5",
