@@ -21,7 +21,7 @@
   <div class="card-body">
     <h5 class="card-title">Want to participate in discussions about this talent?</h5>
     <p class="card-text">Join the Premium Plan to get started!</p>
-    <button id="join-premium-button" class="btn btn-primary" redirect-to="/account/" <%= user ? "" : "disabled"  %>>Join Premium</a>
+    <button id="join-premium-button" class="btn btn-primary" redirect-to="<%= locals.env.BASE_URL %>/account/" <%= user ? "" : "disabled"  %>>Join Premium</a>
   </div>
   <div class="card-footer text-muted">
     Please sign-in to join the Premium Plan.
